@@ -38,6 +38,8 @@ public class RoomDevice {
     @ColumnInfo(name = "device_port")
     private int devicePort;
 
+    @ColumnInfo(name = "out_port")
+    private int outPort;
 
     public int getId() {
         return id;
@@ -89,4 +91,11 @@ public class RoomDevice {
     }
 
 
+    public int getOutPort() {
+        return outPort;
+    }
+
+    public void setOutPort(int outPort) {
+        this.outPort = outPort;
+    }
 }

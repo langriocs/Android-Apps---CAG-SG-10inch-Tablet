@@ -3,13 +3,16 @@ package com.avl.cagApp.repository.tv;
 import android.util.Log;
 
 import com.avl.cagApp.libs.TCPClient;
+import com.avl.cagApp.model.vo.RoomDevice;
+import com.avl.cagApp.repository.IRoomDevice;
 
 import java.util.Locale;
 
-public class LGTVRepository implements ITVRepository{
+public class LGTVRepository implements ITVRepository, IRoomDevice {
 
     private volatile ITVListener listener;
     private final TCPClient tcpClient;
+    private RoomDevice roomDevice;
 
     public LGTVRepository() {
         tcpClient = createClient();
@@ -201,6 +204,16 @@ public class LGTVRepository implements ITVRepository{
     @Override
     public void disconnect() {
         tcpClient.stopClient();
+    }
+
+    @Override
+    public void setRoomDevice(RoomDevice roomDevice) {
+        this.roomDevice = roomDevice;
+    }
+
+    @Override
+    public RoomDevice getRoomDevice() {
+        return this.roomDevice;
     }
 
     @Override

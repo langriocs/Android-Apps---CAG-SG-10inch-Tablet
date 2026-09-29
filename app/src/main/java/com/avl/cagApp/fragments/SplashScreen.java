@@ -67,7 +67,8 @@ public class SplashScreen extends Fragment {
             }
         });
 
-        final String ipAddress = "192.168.1.10";
+//        final String ipAddress = "192.168.1.10";
+        final String ipAddress = "192.168.1.131";
 //        final String ipAddress = MyLibUtil.getIPAddress(true);
         shareViewModel.fetchControlDeviceByIpAddress(ipAddress);
         isFourPanel = shareViewModel.isFourInchPanel();

@@ -6,29 +6,37 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.avl.cagApp.R;
 import com.avl.cagApp.adapter.ControlSwitchAdapter;
 import com.avl.cagApp.adapter.DisplayOutputAdapter;
 import com.avl.cagApp.model.ControlSwitchItem;
 import com.avl.cagApp.model.DisplayOutputItem;
+import com.avl.cagApp.model.vo.RoomDevice;
 import com.avl.cagApp.viewmodel.MasterPanelViewModel;
+import com.avl.cagApp.viewmodel.ShareViewModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class MasterPanel extends Fragment {
 
     private MasterPanelViewModel mViewModel;
+    private ShareViewModel mShareModel;
     private RecyclerView rvOutput;
     private RecyclerView rvControl;
     private List<DisplayOutputItem> displayOutputItems;
@@ -41,8 +49,12 @@ public class MasterPanel extends Fragment {
     private View layoutControl;
     private View btnVideo;
     private View btnControl;
-    private View btnVideoCtrl;
-    private View btnControlCtrl;
+    private View btnHome;
+    private TextView tvRoomName;
+    private CountDownTimer warmupTimer;
+    private View layoutWarmup;
+    private TextView txtWarmupCountdown;
+    private List<Integer> selectedOutput;
 
     public static MasterPanel newInstance() {
         return new MasterPanel();
@@ -53,6 +65,7 @@ public class MasterPanel extends Fragment {
         super.onCreate(savedInstanceState);
 
         mViewModel = new ViewModelProvider(requireActivity()).get(MasterPanelViewModel.class);
+        mShareModel = new ViewModelProvider(requireActivity()).get(ShareViewModel.class);
     }
 
     @Override
@@ -65,11 +78,16 @@ public class MasterPanel extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        tvRoomName = view.findViewById(R.id.txtRoomName);
+        layoutWarmup = view.findViewById(R.id.layoutWarmup);
+        txtWarmupCountdown = view.findViewById(R.id.txtWarmupCountdown);
+
         setupInputButtons(view);
         setupOutputDisplay(view);
         setupControlSwitch(view);
         setupModeNavigation(view);
-        observeViewModel();
+        observerViewModel();
+        fetchControlDevicesData();
     }
 
     private void setSelectedInput(Integer selectedInput) {
@@ -108,21 +126,23 @@ public class MasterPanel extends Fragment {
         layoutVideo = view.findViewById(R.id.layout_master_video);
         layoutControl = view.findViewById(R.id.layout_master_control);
 
+
         btnVideo = view.findViewById(R.id.btn_video);
         btnControl = view.findViewById(R.id.btn_control);
+        btnHome = view.findViewById(R.id.btn_home);
 
         if (btnVideo != null) {
             btnVideo.setOnClickListener(v -> showVideoLayout());
-        }
-        if (btnVideoCtrl != null) {
-            btnVideoCtrl.setOnClickListener(v -> showVideoLayout());
         }
 
         if (btnControl != null) {
             btnControl.setOnClickListener(v -> showControlLayout());
         }
-        if (btnControlCtrl != null) {
-            btnControlCtrl.setOnClickListener(v -> showControlLayout());
+
+        if (btnHome != null) {
+            btnHome.setOnClickListener(v -> {
+                Navigation.findNavController(v).navigate(R.id.action_masterPanel_to_splashScreen1);
+            });
         }
 
         showVideoLayout();
@@ -155,66 +175,20 @@ public class MasterPanel extends Fragment {
             btnVideo.setSelected(isVideoMode);
             btnVideo.setBackgroundResource(isVideoMode ? R.drawable.bg_rounded_card_selected : R.drawable.bg_rounded_card);
         }
-        if (btnVideoCtrl != null) {
-            btnVideoCtrl.setSelected(isVideoMode);
-            btnVideoCtrl.setBackgroundResource(isVideoMode ? R.drawable.bg_rounded_card_selected : R.drawable.bg_rounded_card);
-        }
 
         if (btnControl != null) {
             btnControl.setSelected(!isVideoMode);
             btnControl.setBackgroundResource(!isVideoMode ? R.drawable.bg_rounded_card_selected : R.drawable.bg_rounded_card);
         }
-        if (btnControlCtrl != null) {
-            btnControlCtrl.setSelected(!isVideoMode);
-            btnControlCtrl.setBackgroundResource(!isVideoMode ? R.drawable.bg_rounded_card_selected : R.drawable.bg_rounded_card);
-        }
     }
 
     private void setupOutputDisplay(View view) {
+        selectedOutput = new ArrayList<>();
         rvOutput = view.findViewById(R.id.rv_display_output);
-        displayOutputItems = new ArrayList<>();
-        displayOutputItems.add(new DisplayOutputItem("Hall 1 LED Wall IN 1", R.drawable.ic_display, 1));
-        displayOutputItems.add(new DisplayOutputItem("Hall 1 LED Wall IN 2", R.drawable.ic_display, 2));
-        displayOutputItems.add(new DisplayOutputItem("Hall 2 LED Wall IN 1", R.drawable.ic_display, 3));
-        displayOutputItems.add(new DisplayOutputItem("Hall 2 LED Wall IN 2", R.drawable.ic_display, 4));
-        displayOutputItems.add(new DisplayOutputItem("Hall 2 LED Wall IN 1", R.drawable.ic_display, 5));
-        displayOutputItems.add(new DisplayOutputItem("Hall 2 LED Wall IN 2", R.drawable.ic_display,6));
-        displayOutputItems.add(new DisplayOutputItem("Briefing Room 1 & 2", R.drawable.ic_display,7));
-        displayOutputItems.add(new DisplayOutputItem("CAG OPS Rm Front TV Left", R.drawable.ic_display,9));
-        displayOutputItems.add(new DisplayOutputItem("CAG OPS Rm Front TV Right", R.drawable.ic_display,10));
-        displayOutputItems.add(new DisplayOutputItem("CAG OPS Rm Side TV Left", R.drawable.ic_display, 11));
-        displayOutputItems.add(new DisplayOutputItem("CAG OPS Rm Side TV Right", R.drawable.ic_display, 12));
-        displayOutputItems.add(new DisplayOutputItem("Board Room", R.drawable.ic_display, 13));
-        displayOutputItems.add(new DisplayOutputItem("Training Room", R.drawable.ic_display, 14));
-        displayOutputItems.add(new DisplayOutputItem("CARE OPS Room", R.drawable.ic_display, 15));
-        displayOutputItems.add(new DisplayOutputItem("Airline Room 1", R.drawable.ic_display, 16));
-        displayOutputItems.add(new DisplayOutputItem("Airline Room 2", R.drawable.ic_display, 17));
-        displayOutputItems.add(new DisplayOutputItem("CAG Meeting Room", R.drawable.ic_display, 18));
-        displayOutputItems.add(new DisplayOutputItem("PMA Holding Room", R.drawable.ic_display,19));
-        displayOutputItems.add(new DisplayOutputItem("Police OPS Room", R.drawable.ic_display,20));
-        displayOutputItems.add(new DisplayOutputItem("CID OPS Room", R.drawable.ic_display,21));
 
         GridLayoutManager layoutManager = new GridLayoutManager(requireContext(),8, GridLayoutManager.VERTICAL,false);
-
         rvOutput.setLayoutManager(layoutManager);
 
-        DisplayOutputAdapter adapter = new DisplayOutputAdapter(displayOutputItems, item -> {
-
-            if(item == null) {
-                return;
-            }
-
-            if (buttonInputSelected == null || buttonInputSelected == 0) {
-                return;
-            }
-
-            List<Integer> output = new ArrayList<>();
-            output.add(item.getPortNumber());
-            // on Selected item
-            mViewModel.routeAV( buttonInputSelected, output);
-        });
-
-        rvOutput.setAdapter(adapter);
     }
 
     private void setupControlSwitch(View view) {
@@ -250,18 +224,127 @@ public class MasterPanel extends Fragment {
         rvControl.setAdapter(adapter);
     }
 
-    private void observeViewModel() {
+    private void observerViewModel() {
 
+
+        mViewModel.getIsSystemInitialized().observe(getViewLifecycleOwner(), isInitialized -> {
+            if (!isInitialized) {
+                startWarmup(layoutWarmup, txtWarmupCountdown);
+            } else {
+                layoutWarmup.setVisibility(View.GONE);
+            }
+        });
+
+        mViewModel.getIsSwitcherConnected().observe(getViewLifecycleOwner(), isConnected -> {
+            Log.d("cag", "switcher connected:" + (isConnected ? "OK" : "DisConnected") );
+        });
+    }
+
+    private void fetchControlDevicesData() {
+        if (displayOutputItems != null) {
+            displayOutputItems.clear();
+            displayOutputItems = null;
+        }
+
+        displayOutputItems = new ArrayList<>();
+        mShareModel.getControlRoomDevices().observe(getViewLifecycleOwner(), controlRoomDevices -> {
+            if (controlRoomDevices != null) {
+                tvRoomName.setText(controlRoomDevices.controlDevice.getRoomName());
+                if (controlRoomDevices.roomDevices != null) {
+
+                    controlRoomDevices.roomDevices.forEach(roomDevice -> {
+                        mViewModel.connectDevice(roomDevice);
+                    });
+
+                    List<RoomDevice> roomDeviceList = controlRoomDevices.roomDevices.stream()
+                            .filter(roomDevice -> {
+                                if (roomDevice.getDeviceName().equals("LED_WALL"))
+                                    return true;
+                                if (roomDevice.getDeviceName().equals("TV"))
+                                    return true;
+                                if (roomDevice.getDeviceName().equals("TV_AUDIO"))
+                                    return true;
+                                if (roomDevice.getDeviceName().equals("LED_AUDIO"))
+                                    return true;
+
+                                return false;
+                            })
+                            .collect(Collectors.toList());
+
+                    roomDeviceList.forEach(roomDevice -> {
+//                        Log.d("cag", roomDevice.getDeviceName());
+                        DisplayOutputItem item = new DisplayOutputItem(
+                                roomDevice.getId(),
+                                roomDevice.getDeviceDesc(),
+                                R.drawable.ic_display,
+                                roomDevice.getOutPort(),
+                                roomDevice.getDeviceName(),
+                                roomDevice);
+
+                        displayOutputItems.add(item);
+                    });
+
+                    DisplayOutputAdapter adapter = new DisplayOutputAdapter(displayOutputItems, item -> {
+
+                        if(item == null) {
+                            return;
+                        }
+
+                        if (buttonInputSelected == null || buttonInputSelected == 0) {
+                            return;
+                        }
+
+                        selectedOutput.add(item.getPortNumber());
+
+                        // on Selected item
+                        mViewModel.routeSourceToDevice(buttonInputSelected, item);
+
+                        setSelectedInput(0);
+
+                    });
+
+                    rvOutput.setAdapter(adapter);
+                }
+            }
+        });
+    }
+
+    private void startWarmup(View layoutWarmup, TextView txtWarmupCountdown) {
+        layoutWarmup.setVisibility(View.VISIBLE);
+
+        if (warmupTimer != null) {
+            warmupTimer.cancel();
+        }
+
+        warmupTimer = new CountDownTimer(10000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                String secUntilFinished = (millisUntilFinished / 1000) + "s";
+                txtWarmupCountdown.setText(secUntilFinished);
+            }
+
+            @Override
+            public void onFinish() {
+                mViewModel.setSystemInitialized(true);
+            }
+        }.start();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        mViewModel.setSystemInitialized(false);
+
         if (rvOutput != null) {
             rvOutput.setAdapter(null);
         }
+
         rvOutput = null;
         inputButtons.clear();
         displayOutputItems.clear();
+        controlSwitchItems.clear();
+        warmupTimer.cancel();
+        warmupTimer = null;
+
     }
 }

@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.avl.cagApp.repository.IRoomDevice;
+import com.avl.cagApp.repository.switcher.Switch32x32Repository;
 import com.avl.cagApp.repository.switcher.Switch5x1Output;
 import com.avl.cagApp.repository.tv.TVPowerState;
 import com.avl.cagApp.repository.switcher.ISwitchListener;
@@ -26,8 +28,8 @@ public class ControlScreenViewModel extends ViewModel {
     private final MutableLiveData<Integer> tvVolume = new MutableLiveData<>(50);
 
 
-    private final ITVRepository tvRepository;
-    private final ISwitchRepository switchRepository;
+    private final IRoomDevice tvRepository;
+    private final IRoomDevice switchRepository;
 
     public ControlScreenViewModel () {
         tvRepository = new LGTVRepository();
@@ -81,7 +83,7 @@ public class ControlScreenViewModel extends ViewModel {
 
     // TV setup
     private void setupTVListener() {
-        tvRepository.setListener(new ITVListener() {
+        ((LGTVRepository) tvRepository).setListener(new ITVListener() {
             @Override
             public void onConnected() {
                 isTVConnected.postValue(true);
@@ -119,24 +121,24 @@ public class ControlScreenViewModel extends ViewModel {
     }
 
     public void turnOnTV() {
-        tvRepository.turnOn();
+        ((LGTVRepository) tvRepository).turnOn();
     }
 
     public void turnOffTV() {
-        tvRepository.turnOff();
+        ((LGTVRepository) tvRepository).turnOff();
     }
 
     public void changeMute(boolean isMute) {
-        tvRepository.setMute(isMute);
+        ((LGTVRepository) tvRepository).setMute(isMute);
     }
 
     public void changeVolume(int volume) {
-        tvRepository.setVolume(volume);
+        ((LGTVRepository) tvRepository).setVolume(volume);
     }
 
     // Switch setup
     private void setupSwitchListener() {
-        switchRepository.setListener(new ISwitchListener() {
+        ((Switch5x1Repository) switchRepository).setListener(new ISwitchListener() {
             @Override
             public void onConnected() {
                 isSwitcherConnected.postValue(true);
@@ -158,13 +160,13 @@ public class ControlScreenViewModel extends ViewModel {
     public void routeInputSourceToUSB() {
         isUsbCSelected.postValue(true);
         isWirelessSelected.postValue(false);
-        switchRepository.routeInputSourceTo(Switch5x1Output.USB_1);
+        ((Switch5x1Repository) switchRepository).routeInputSourceTo(Switch5x1Output.USB_1);
     }
 
     public void routeInputSourceToWireless() {
         isUsbCSelected.postValue(false);
         isWirelessSelected.postValue(true);
-        switchRepository.routeInputSourceTo(Switch5x1Output.HDMI_4);
+        ((Switch5x1Repository) switchRepository).routeInputSourceTo(Switch5x1Output.HDMI_4);
     }
 
 

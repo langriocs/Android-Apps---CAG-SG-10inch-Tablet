@@ -14,4 +14,5 @@
     <color name="button_source_selected_color">#1e519e</color>"
     <color name="button_border_source_selected_color">#3d92e5</color>
     <color name="button_power_color">#291924</color>
+    <color name="switch_track">#404CAF50</color>
 </resources>

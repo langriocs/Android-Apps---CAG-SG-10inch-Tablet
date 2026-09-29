@@ -27,6 +27,9 @@
         <action
             android:id="@+id/action_splashScreen1_to_masterPanel"
             app:destination="@id/masterPanel" />
+        <action
+            android:id="@+id/action_splashScreen1_to_hallPanel"
+            app:destination="@id/hallPanel" />
     </fragment>
     <fragment
         android:id="@+id/controlScreen1"
@@ -64,4 +67,9 @@
             android:id="@+id/action_masterPanel_to_splashScreen1"
             app:destination="@id/splashScreen1" />
     </fragment>
+    <fragment
+        android:id="@+id/hallPanel"
+        android:name="com.avl.cagApp.fragments.HallPanel"
+        android:label="fragment_hall_panel"
+        tools:layout="@layout/fragment_hall_panel" />
 </navigation>

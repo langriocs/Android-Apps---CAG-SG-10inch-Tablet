@@ -25,7 +25,7 @@
         android:layout_marginTop="20dp"
         android:text="@string/touch_screen_to_start"
         android:textSize="32sp"
-        android:textColor="#a3a3a3"
+        android:textColor="#7F5934"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/logo" />
@@ -40,6 +40,6 @@
         android:layout_marginTop="20dp"
         android:textAllCaps="true"
         android:textSize="28sp"
-        android:textColor="@color/dirty_white"  />
+        android:textColor="#7F5934"  />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,20 +1,17 @@
-package com.avl.cagApp.repository.switcher;
+package com.avl.cagApp.repository.ledwall;
 
 import com.avl.cagApp.libs.TCPClient;
 import com.avl.cagApp.model.vo.RoomDevice;
 import com.avl.cagApp.repository.IRoomDevice;
+import com.avl.cagApp.repository.tv.ITVListener;
 
-import java.util.List;
-import java.util.stream.Collectors;
+public class LEDWallRepository implements ILEDWallRepository, IRoomDevice {
 
-public class Switch32x32Repository implements ISwitchRepository, IRoomDevice {
-
-    private volatile ISwitchListener listener;
+    private ILEDWallListener listener;
     private final TCPClient tcpClient;
-
     private RoomDevice roomDevice;
 
-    public Switch32x32Repository() {
+    public LEDWallRepository() {
         this.tcpClient = createClient();
     }
 
@@ -32,7 +29,7 @@ public class Switch32x32Repository implements ISwitchRepository, IRoomDevice {
         }, new TCPClient.OnConnectionStatusChanged() {
             @Override
             public void onConnected() {
-                ISwitchListener currentListener = listener;
+                ILEDWallListener currentListener = listener;
                 if (currentListener != null) {
                     currentListener.onConnected();
                 }
@@ -40,7 +37,7 @@ public class Switch32x32Repository implements ISwitchRepository, IRoomDevice {
 
             @Override
             public void onDisconnected() {
-                ISwitchListener currentListener = listener;
+                ILEDWallListener currentListener = listener;
                 if (currentListener != null) {
                     currentListener.onDisconnected();
                 }
@@ -52,10 +49,17 @@ public class Switch32x32Repository implements ISwitchRepository, IRoomDevice {
 
     }
 
-    private String parseSelectedOutput(List<Integer> selectedOutput) {
-        return selectedOutput.stream()
-                .map(String::valueOf)
-                .collect(Collectors.joining(","));
+    @Override
+    public void setPreset(int preset) {
+        if (preset == 1) {
+            tcpClient.sendHex("55 AA 00 00 FE 00 00 00 00 00 01 00 00 01 51 13 01 00 00 B6 56\r");
+        }
+        if (preset == 2) {
+            tcpClient.sendHex("55 AA 00 00 FE 00 00 00 00 00 01 00 00 01 51 13 01 00 01 B7 56\r");
+        }
+        if (preset == 3) {
+            tcpClient.sendHex("55 AA 00 00 FE 00 00 00 00 00 01 00 00 01 51 13 01 00 02 B8 56\r");
+        }
     }
 
     @Override
@@ -79,24 +83,8 @@ public class Switch32x32Repository implements ISwitchRepository, IRoomDevice {
     }
 
     @Override
-    public void routeInputSourceTo(Switch5x1Output output) {
-
-    }
-
-    @Override
-    public void routeAV(Integer selectedInput, Integer selectedOutput) {
-//        String selOutput = parseSelectedOutput(selectedOutput);
-        tcpClient.sendMessage("s in " + selectedInput.toString() + " av out " + selectedOutput.toString() +"! \r");
-    }
-
-    @Override
-    public void routeAudio(Integer selectedInput, AudioMode mode) {
-        tcpClient.sendMessage("s input " + selectedInput.toString() + " audio mode " + String.valueOf(mode.getValue()) +"! \r");
-    }
-
-    @Override
-    public void setListener(ISwitchListener switchListener) {
-        this.listener = switchListener;
+    public void setListener(ILEDWallListener listener) {
+        this.listener = listener;
     }
 
     @Override
@@ -104,5 +92,4 @@ public class Switch32x32Repository implements ISwitchRepository, IRoomDevice {
         this.listener = null;
         tcpClient.cleanup();
     }
-
 }
