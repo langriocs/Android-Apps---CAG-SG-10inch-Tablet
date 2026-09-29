@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.avl.cagApp.AppConstant;
 import com.avl.cagApp.R;
+import com.avl.cagApp.libs.MyLibUtil;
 import com.avl.cagApp.viewmodel.ShareViewModel;
 import com.google.android.material.button.MaterialButton;
 
@@ -67,8 +68,8 @@ public class SplashScreen extends Fragment {
             }
         });
 
-//        final String ipAddress = "192.168.1.10";
-        final String ipAddress = "192.168.1.131";
+        final String ipAddress = "192.168.1.30";
+//        final String ipAddress = "192.168.1.131";
 //        final String ipAddress = MyLibUtil.getIPAddress(true);
         shareViewModel.fetchControlDeviceByIpAddress(ipAddress);
         isFourPanel = shareViewModel.isFourInchPanel();
@@ -78,6 +79,10 @@ public class SplashScreen extends Fragment {
         if (isFourPanel) {
             Navigation.findNavController(v).navigate(R.id.action_splashScreen_to_controlScreen);
         } else {
+
+            if (controlDeviceUI == AppConstant.UI_0) {
+                Navigation.findNavController(v).navigate(R.id.action_splashScreen_to_controlScreen);
+            }
             if (controlDeviceUI == AppConstant.UI_1) {
                 Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_controlScreen1);
             }
