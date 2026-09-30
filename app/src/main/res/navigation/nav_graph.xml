@@ -2,30 +2,74 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nav_graph"
-    app:startDestination="@id/splashScreen">
+    android:id="@+id/nav_graph10"
+    app:startDestination="@id/splashScreen1">
 
     <activity
-        android:id="@+id/mainActivity"
+        android:id="@+id/mainActivity1"
         android:name="com.avl.cagApp.MainActivity"
         android:label="activity_main"
         tools:layout="@layout/activity_main" />
     <fragment
-        android:id="@+id/controlScreen"
-        android:name="com.avl.cagApp.fragments.ControlScreen"
-        android:label="fragment_control_screen"
-        tools:layout="@layout/fragment_control_screen" >
-        <action
-            android:id="@+id/action_controlScreen_to_splashScreen"
-            app:destination="@id/splashScreen" />
-    </fragment>
-    <fragment
-        android:id="@+id/splashScreen"
+        android:id="@+id/splashScreen1"
         android:name="com.avl.cagApp.fragments.SplashScreen"
         android:label="fragment_splash_screen"
         tools:layout="@layout/fragment_splash_screen" >
         <action
-            android:id="@+id/action_splashScreen_to_controlScreen"
-            app:destination="@id/controlScreen" />
+            android:id="@+id/action_splashScreen1_to_controlScreen1"
+            app:destination="@id/controlScreen1" />
+        <action
+            android:id="@+id/action_splashScreen1_to_controlScreen2"
+            app:destination="@id/controlScreen2" />
+        <action
+            android:id="@+id/action_splashScreen1_to_controlScreen3"
+            app:destination="@id/controlScreen3" />
+        <action
+            android:id="@+id/action_splashScreen1_to_masterPanel"
+            app:destination="@id/masterPanel" />
+        <action
+            android:id="@+id/action_splashScreen1_to_hallPanel"
+            app:destination="@id/hallPanel" />
     </fragment>
+    <fragment
+        android:id="@+id/controlScreen1"
+        android:name="com.avl.cagApp.fragments.ControlScreen1"
+        android:label="fragment_control_screen1"
+        tools:layout="@layout/fragment_control_screen1" >
+        <action
+            android:id="@+id/action_controlScreen1_to_splashScreen1"
+            app:destination="@id/splashScreen1" />
+    </fragment>
+    <fragment
+        android:id="@+id/controlScreen2"
+        android:name="com.avl.cagApp.fragments.ControlScreen2"
+        android:label="fragment_control_screen2"
+        tools:layout="@layout/fragment_control_screen2" >
+        <action
+            android:id="@+id/action_controlScreen2_to_splashScreen1"
+            app:destination="@id/splashScreen1" />
+    </fragment>
+    <fragment
+        android:id="@+id/controlScreen3"
+        android:name="com.avl.cagApp.fragments.ControlScreen3"
+        android:label="fragment_control_screen3"
+        tools:layout="@layout/fragment_control_screen3" >
+        <action
+            android:id="@+id/action_controlScreen3_to_splashScreen1"
+            app:destination="@id/splashScreen1" />
+    </fragment>
+    <fragment
+        android:id="@+id/masterPanel"
+        android:name="com.avl.cagApp.fragments.MasterPanel"
+        android:label="fragment_master_panel"
+        tools:layout="@layout/fragment_master_panel" >
+        <action
+            android:id="@+id/action_masterPanel_to_splashScreen1"
+            app:destination="@id/splashScreen1" />
+    </fragment>
+    <fragment
+        android:id="@+id/hallPanel"
+        android:name="com.avl.cagApp.fragments.HallPanel"
+        android:label="fragment_hall_panel"
+        tools:layout="@layout/fragment_hall_panel" />
 </navigation>

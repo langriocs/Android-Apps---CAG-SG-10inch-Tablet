@@ -42,21 +42,6 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        ShareViewModel viewModel = new ViewModelProvider(this).get(ShareViewModel.class);
-        viewModel.setIspFourInchPanel(isFourInchPanel());
-
-//        if (isFourInchPanel()) {
-//            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
-//        } else {
-//            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-//        }
-
-    }
-
-    private boolean isFourInchPanel() {
-        DisplayMetrics dm = getResources().getDisplayMetrics();
-//        showAlert("width: " + dm.widthPixels + " height: " + dm.heightPixels);
-        return true; //dm.widthPixels < 480 && dm.heightPixels == 444;
     }
 
     private void showAlert(String message ) {

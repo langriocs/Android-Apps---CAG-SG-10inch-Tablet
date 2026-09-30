@@ -69,31 +69,25 @@ public class SplashScreen extends Fragment {
         });
 
 //        final String ipAddress = "192.168.1.30";
-//        final String ipAddress = "192.168.1.131";
-        final String ipAddress = MyLibUtil.getIPAddress(true);
+        final String ipAddress = "192.168.1.131";
+//        final String ipAddress = MyLibUtil.getIPAddress(true);
         shareViewModel.fetchControlDeviceByIpAddress(ipAddress);
         isFourPanel = shareViewModel.isFourInchPanel();
     }
 
     private void proceedToNextScreen(View v) {
-        if (isFourPanel) {
-            Navigation.findNavController(v).navigate(R.id.action_splashScreen_to_controlScreen);
-        } else {
-//            if (controlDeviceUI == AppConstant.UI_0) {
-//                Navigation.findNavController(v).navigate(R.id.action_splashScreen_to_controlScreen);
-//            }
-            if (controlDeviceUI == AppConstant.UI_1) {
-                Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_controlScreen1);
-            }
-            if (controlDeviceUI == AppConstant.UI_2) {
-                Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_controlScreen2);
-            }
-            if (controlDeviceUI == AppConstant.UI_3) {
-                Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_controlScreen3);
-            }
-            if (controlDeviceUI == AppConstant.UI_4) {
-                Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_masterPanel);
-            }
+
+        if (controlDeviceUI == AppConstant.UI_1) {
+            Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_controlScreen1);
+        }
+        if (controlDeviceUI == AppConstant.UI_2) {
+            Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_controlScreen2);
+        }
+        if (controlDeviceUI == AppConstant.UI_3) {
+            Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_controlScreen3);
+        }
+        if (controlDeviceUI == AppConstant.UI_4) {
+            Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_masterPanel);
         }
     }
 
