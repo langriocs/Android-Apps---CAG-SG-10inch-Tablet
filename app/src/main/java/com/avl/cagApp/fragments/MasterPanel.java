@@ -266,6 +266,10 @@ public class MasterPanel extends Fragment {
                                     return true;
                                 if (roomDevice.getDeviceName().equals("LED_AUDIO"))
                                     return true;
+                                if (roomDevice.getDeviceName().equals("Switch")) {
+                                    if (roomDevice.getParentId() > 0)
+                                        return true;
+                                }
 
                                 return false;
                             })

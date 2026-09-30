@@ -24,6 +24,7 @@ import com.avl.cagApp.repository.tv.TVPowerState;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MasterPanelViewModel extends ViewModel {
 
@@ -33,6 +34,7 @@ public class MasterPanelViewModel extends ViewModel {
     private final MutableLiveData<Boolean> isTVConnected = new MutableLiveData<>(false);
 
     private final List<IRoomDevice> devices = new ArrayList<>();
+    private ISwitchRepository parentSwitch;
 
     public MasterPanelViewModel() {
 //        setupSwitchListener();
@@ -70,22 +72,14 @@ public class MasterPanelViewModel extends ViewModel {
 
     public void routeSourceToDevice(int selectedInput, DisplayOutputItem selectedOutput) {
 
-        for (IRoomDevice device : devices) {
-            if (device != null) {
-//                if (device.getRoomDevice().getId() == selectedOutput.getDeviceId()) {
-                    if (device instanceof Switch32x32Repository) {
-                        ((Switch32x32Repository) device).routeAudio(selectedInput, AudioMode.SOURCE);
-                        ((Switch32x32Repository) device).routeAV(selectedInput, selectedOutput.getPortNumber());
-
-                        break;
-                    }
-//                }
-            }
+        if (parentSwitch != null) {
+            parentSwitch.routeAudio(selectedInput, AudioMode.SOURCE);
+            parentSwitch.routeAV(selectedInput, selectedOutput.getPortNumber());
         }
 
         for (IRoomDevice device : devices) {
             if (device != null) {
-                if (device.getRoomDevice().getId() == selectedOutput.getDeviceId()) {
+                if (device.getRoomDevice().getOutPort() == selectedOutput.getRoomDevice().getOutPort()) {
                     if (device instanceof LEDWallRepository) {
                         ((LEDWallRepository) device).setPreset(1);
                     }
@@ -149,9 +143,14 @@ public class MasterPanelViewModel extends ViewModel {
                 isSwitcherConnected.postValue(false);
             }
         });
+
         switchRepository.connect(roomDevice.getDeviceIpAddress(), roomDevice.getDevicePort());
         switchRepository.setRoomDevice(roomDevice);
-        devices.add(switchRepository);
+        if (roomDevice.getParentId() == 0) {
+            parentSwitch = (Switch32x32Repository) switchRepository;
+        } else {
+            devices.add(switchRepository);
+        }
     }
 
     private void connectLEDWall(RoomDevice roomDevice) {

@@ -64,13 +64,13 @@ public class SplashScreen extends Fragment {
                 tvRoomName.setText(controlRoomDevice.controlDevice.getRoomName());
                 controlDeviceUI = controlRoomDevice.controlDevice.getDeviceUI();
             } else {
-                showAlert();
+                showAlert("Device IP Address not found! Please contact the admin.");
             }
         });
 
-        final String ipAddress = "192.168.1.30";
+//        final String ipAddress = "192.168.1.30";
 //        final String ipAddress = "192.168.1.131";
-//        final String ipAddress = MyLibUtil.getIPAddress(true);
+        final String ipAddress = MyLibUtil.getIPAddress(true);
         shareViewModel.fetchControlDeviceByIpAddress(ipAddress);
         isFourPanel = shareViewModel.isFourInchPanel();
     }
@@ -79,10 +79,9 @@ public class SplashScreen extends Fragment {
         if (isFourPanel) {
             Navigation.findNavController(v).navigate(R.id.action_splashScreen_to_controlScreen);
         } else {
-
-            if (controlDeviceUI == AppConstant.UI_0) {
-                Navigation.findNavController(v).navigate(R.id.action_splashScreen_to_controlScreen);
-            }
+//            if (controlDeviceUI == AppConstant.UI_0) {
+//                Navigation.findNavController(v).navigate(R.id.action_splashScreen_to_controlScreen);
+//            }
             if (controlDeviceUI == AppConstant.UI_1) {
                 Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_controlScreen1);
             }
@@ -95,15 +94,13 @@ public class SplashScreen extends Fragment {
             if (controlDeviceUI == AppConstant.UI_4) {
                 Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_masterPanel);
             }
-
         }
     }
 
-    private void showAlert() {
+    private void showAlert(String message ) {
         CustomAlertDialog alertScreenDialog = new CustomAlertDialog();
         alertScreenDialog.setTitle("Changi Airport Group");
-        alertScreenDialog.setMessage("Device IP Address not found! Please contact the admin.");
+        alertScreenDialog.setMessage(message);
         alertScreenDialog.show(getParentFragmentManager(), "alert dialog");
     }
-
 }

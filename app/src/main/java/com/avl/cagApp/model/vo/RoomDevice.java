@@ -41,6 +41,9 @@ public class RoomDevice {
     @ColumnInfo(name = "out_port")
     private int outPort;
 
+    @ColumnInfo(name = "parent_id")
+    private int parentId;
+
     public int getId() {
         return id;
     }
@@ -97,5 +100,13 @@ public class RoomDevice {
 
     public void setOutPort(int outPort) {
         this.outPort = outPort;
+    }
+
+    public int getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(int parentId) {
+        this.parentId = parentId;
     }
 }

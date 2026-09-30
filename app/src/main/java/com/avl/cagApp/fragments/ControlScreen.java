@@ -218,6 +218,14 @@ public class ControlScreen extends Fragment {
         });
     }
 
+    private void showAlert() {
+        CustomAlertDialog alertScreenDialog = new CustomAlertDialog();
+        alertScreenDialog.setTitle("Changi Airport Group");
+        alertScreenDialog.setMessage("Device IP Address not found! Please contact the admin.");
+        alertScreenDialog.show(getParentFragmentManager(), "alert dialog");
+    }
+
+
     private void startWarmup(View layoutWarmup, TextView txtWarmupCountdown) {
         layoutWarmup.setVisibility(View.VISIBLE);
 

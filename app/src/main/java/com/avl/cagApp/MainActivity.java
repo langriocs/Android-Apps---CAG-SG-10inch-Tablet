@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
                 ViewCompat.getWindowInsetsController(getWindow().getDecorView());
         if (windowInsetsController != null) {
             windowInsetsController.setSystemBarsBehavior(
-                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
             );
             windowInsetsController.hide(WindowInsetsCompat.Type.systemBars());
         }
@@ -45,18 +45,24 @@ public class MainActivity extends AppCompatActivity {
         ShareViewModel viewModel = new ViewModelProvider(this).get(ShareViewModel.class);
         viewModel.setIspFourInchPanel(isFourInchPanel());
 
-        if (isFourInchPanel()) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        }
+//        if (isFourInchPanel()) {
+//            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
+//        } else {
+//            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+//        }
 
     }
 
     private boolean isFourInchPanel() {
         DisplayMetrics dm = getResources().getDisplayMetrics();
-        return dm.widthPixels == 480 && dm.heightPixels == 480;
+//        showAlert("width: " + dm.widthPixels + " height: " + dm.heightPixels);
+        return true; //dm.widthPixels < 480 && dm.heightPixels == 444;
     }
 
-
+    private void showAlert(String message ) {
+        CustomAlertDialog alertScreenDialog = new CustomAlertDialog();
+        alertScreenDialog.setTitle("Changi Airport Group");
+        alertScreenDialog.setMessage(message);
+        alertScreenDialog.show(getSupportFragmentManager(), "alert dialog");
+    }
 }
