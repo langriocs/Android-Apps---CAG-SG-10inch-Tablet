@@ -7,12 +7,12 @@
 
     <activity
         android:id="@+id/mainActivity1"
-        android:name="com.avl.cagApp.MainActivity"
+        android:name="com.avl.cag10inchApp.MainActivity"
         android:label="activity_main"
         tools:layout="@layout/activity_main" />
     <fragment
         android:id="@+id/splashScreen1"
-        android:name="com.avl.cagApp.fragments.SplashScreen"
+        android:name="com.avl.cag10inchApp.fragments.SplashScreen"
         android:label="fragment_splash_screen"
         tools:layout="@layout/fragment_splash_screen" >
         <action
@@ -33,7 +33,7 @@
     </fragment>
     <fragment
         android:id="@+id/controlScreen1"
-        android:name="com.avl.cagApp.fragments.ControlScreen1"
+        android:name="com.avl.cag10inchApp.fragments.ControlScreen1"
         android:label="fragment_control_screen1"
         tools:layout="@layout/fragment_control_screen1" >
         <action
@@ -42,7 +42,7 @@
     </fragment>
     <fragment
         android:id="@+id/controlScreen2"
-        android:name="com.avl.cagApp.fragments.ControlScreen2"
+        android:name="com.avl.cag10inchApp.fragments.ControlScreen2"
         android:label="fragment_control_screen2"
         tools:layout="@layout/fragment_control_screen2" >
         <action
@@ -51,7 +51,7 @@
     </fragment>
     <fragment
         android:id="@+id/controlScreen3"
-        android:name="com.avl.cagApp.fragments.ControlScreen3"
+        android:name="com.avl.cag10inchApp.fragments.ControlScreen3"
         android:label="fragment_control_screen3"
         tools:layout="@layout/fragment_control_screen3" >
         <action
@@ -60,7 +60,7 @@
     </fragment>
     <fragment
         android:id="@+id/masterPanel"
-        android:name="com.avl.cagApp.fragments.MasterPanel"
+        android:name="com.avl.cag10inchApp.fragments.MasterPanel"
         android:label="fragment_master_panel"
         tools:layout="@layout/fragment_master_panel" >
         <action
@@ -69,7 +69,7 @@
     </fragment>
     <fragment
         android:id="@+id/hallPanel"
-        android:name="com.avl.cagApp.fragments.HallPanel"
+        android:name="com.avl.cag10inchApp.fragments.HallPanel"
         android:label="fragment_hall_panel"
         tools:layout="@layout/fragment_hall_panel" />
 </navigation>

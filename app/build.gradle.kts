@@ -3,13 +3,13 @@ plugins {
 }
 
 android {
-    namespace = "com.avl.cagApp"
+    namespace = "com.avl.cag10inchApp"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.avl.cagApp"
+        applicationId = "com.avl.cag10inchApp"
         minSdk = 26
         targetSdk = 37
         versionCode = 1

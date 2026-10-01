@@ -1,0 +1,96 @@
+package com.avl.cag10inchApp.repository.audio;
+
+import com.avl.cag10inchApp.libs.TCPClient;
+import com.avl.cag10inchApp.model.vo.RoomDevice;
+import com.avl.cag10inchApp.repository.IRoomDevice;
+import com.avl.cag10inchApp.repository.ledwall.ILEDWallListener;
+import com.avl.cag10inchApp.repository.tv.ITVListener;
+
+public class DSPRepository implements IDSPRepository, IRoomDevice {
+
+    private volatile IAudioListener listener;
+    private final TCPClient tcpClient;
+    private RoomDevice roomDevice;
+
+
+    public DSPRepository() {
+        tcpClient = createClient();
+    }
+
+    private TCPClient createClient() {
+        return new TCPClient("cag", new TCPClient.OnMessageReceived() {
+            @Override
+            public void onMessageReceived(String message) {
+                if (message == null || message.trim().isEmpty()) {
+                    return;
+                }
+
+                handleMessage(message);
+
+            }
+        }, new TCPClient.OnConnectionStatusChanged() {
+            @Override
+            public void onConnected() {
+                IAudioListener currentListener = listener;
+                if (currentListener != null) {
+                    currentListener.onConnected();
+                }
+            }
+
+            @Override
+            public void onDisconnected() {
+                IAudioListener currentListener = listener;
+                if (currentListener != null) {
+                    currentListener.onDisconnected();
+                }
+            }
+        });
+    }
+
+    private void handleMessage(String message) {
+
+    }
+
+    @Override
+    public void connect(String ip, int port) {
+
+    }
+
+    @Override
+    public void disconnect() {
+
+    }
+
+    @Override
+    public void setRoomDevice(RoomDevice roomDevice) {
+
+    }
+
+    @Override
+    public RoomDevice getRoomDevice() {
+        return null;
+    }
+
+    @Override
+    public void setMute() {
+        tcpClient.sendMessage("GICM O 0000 00 NC 0 \r");
+    }
+
+    @Override
+    public void setListener(ILEDWallListener listener) {
+
+    }
+
+    @Override
+    public void cleanup() {
+
+    }
+
+    public IAudioListener getListener() {
+        return listener;
+    }
+
+    public void setListener(IAudioListener listener) {
+        this.listener = listener;
+    }
+}
