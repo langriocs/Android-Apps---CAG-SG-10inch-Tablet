@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.avl.cagApp.R;
 import com.avl.cagApp.model.ControlSwitchItem;
-import com.avl.cagApp.model.DisplayOutputItem;
 
 import java.util.List;
 
@@ -36,7 +35,7 @@ public class ControlSwitchAdapter extends RecyclerView.Adapter<ItemControlHolder
     public void onBindViewHolder(@NonNull ItemControlHolder holder, int position) {
 
         ControlSwitchItem item = controlSwitchItems.get(position);
-        if (item.getPortNumber() == 0) {
+        if (item.getOutportNumber() == 0) {
             holder.itemView.setVisibility(GONE);
             return;
         }

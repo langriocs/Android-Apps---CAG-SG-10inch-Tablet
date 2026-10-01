@@ -1,5 +1,6 @@
 package com.avl.cagApp.viewmodel;
 
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -23,7 +24,10 @@ import com.avl.cagApp.repository.tv.LGTVRepository;
 import com.avl.cagApp.repository.tv.TVPowerState;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Handler;
 import java.util.stream.Collectors;
 
 public class MasterPanelViewModel extends ViewModel {
@@ -34,7 +38,9 @@ public class MasterPanelViewModel extends ViewModel {
     private final MutableLiveData<Boolean> isTVConnected = new MutableLiveData<>(false);
 
     private final List<IRoomDevice> devices = new ArrayList<>();
+    private final Map<String, IRoomDevice> controlDeviceItems = new HashMap<>();
     private ISwitchRepository parentSwitch;
+
 
     public MasterPanelViewModel() {
 //        setupSwitchListener();
@@ -68,51 +74,116 @@ public class MasterPanelViewModel extends ViewModel {
     }
 
     public void routeAV(int selectedInput, List<Integer> selectedOutput) {
+
     }
 
     public void routeSourceToDevice(int selectedInput, DisplayOutputItem selectedOutput) {
 
-        if (parentSwitch != null) {
-            parentSwitch.routeAudio(selectedInput, AudioMode.SOURCE);
-            parentSwitch.routeAV(selectedInput, selectedOutput.getPortNumber());
+        if (parentSwitch == null) {
+            return;
         }
+
+        parentSwitch.routeAV(selectedInput, selectedOutput.getPortNumber());
 
         for (IRoomDevice device : devices) {
             if (device != null) {
-                if (device.getRoomDevice().getOutPort() == selectedOutput.getRoomDevice().getOutPort()) {
+                if (device.getRoomDevice().getId() == selectedOutput.getDeviceId()) {
                     if (device instanceof LEDWallRepository) {
                         ((LEDWallRepository) device).setPreset(1);
+                        break;
                     }
 
                     if (device instanceof LGTVRepository ) {
                         ((LGTVRepository) device).turnOn();
+                        break;
+                    }
+
+                    if (device instanceof Switch32x32Repository) {
+                        ((Switch32x32Repository) device).routeAV(5, 1);
+                        break;
                     }
                 }
             }
         }
-
-
-
-//        devices.forEach(iRoomDevice -> {
-//            if (iRoomDevice.getRoomDevice().getId() == selectedOutput.getDeviceId()) {
-//
-//            }
-//
-//            if (iRoomDevice instanceof LEDWallRepository) {
-//
-//                if (iRoomDevice.getRoomDevice().getDeviceName().equals("LED Wall Hall 2 Front")) {
-//
-//                }
-//
-////                ((LEDWallRepository) iRoomDevice).routeSourceToLED(selectedInput, selectedOutput);
-//            }
-//        });
     }
 
-    public void routeAudio(int selectedInput) {
+    public void setControlSwitchItems(List<ControlSwitchItem> controlSwitchItems) {
+        for (ControlSwitchItem controlSwitchItem : controlSwitchItems) {
+            if (controlSwitchItem.getDeviceType().equals("TV")) {
+                ITVRepository tvRepository = new LGTVRepository();
+                tvRepository.setListener(new ITVListener() {
+                    @Override
+                    public void onConnected() {
+                        // query for power status
+                        tvRepository.getStatus();
+                    }
+
+                    @Override
+                    public void onDisconnected() {
+
+                    }
+
+                    @Override
+                    public void onPowerStateChanged(TVPowerState state) {
+                        if (state == TVPowerState.ON) {
+                            controlSwitchItem.setState(true);
+                        }
+
+                        if (state == TVPowerState.OFF) {
+                            controlSwitchItem.setState(false);
+                        }
+
+                    }
+
+                    @Override
+                    public void onVolumeChanged(int volume) {
+
+                    }
+
+                    @Override
+                    public void onMuteChanged(boolean isMuted) {
+
+                    }
+
+                    @Override
+                    public void onError(String message) {
+
+                    }
+                });
+                ((IRoomDevice) tvRepository).connect(controlSwitchItem.getIpAddress(), controlSwitchItem.getPortNumber());
+                controlDeviceItems.put(controlSwitchItem.getIpAddress(), (IRoomDevice) tvRepository);
+            }
+            if (controlSwitchItem.getDeviceType().equals("LED_WALL")) {
+                ILEDWallRepository ledWallRepository = new LEDWallRepository();
+                ledWallRepository.setListener(new ILEDWallListener() {
+                    @Override
+                    public void onConnected() {
+                        // query for power status here
+                        ledWallRepository.getStatus();
+                    }
+
+                    @Override
+                    public void onDisconnected() {
+
+                    }
+                });
+                ((IRoomDevice) ledWallRepository).connect(controlSwitchItem.getIpAddress(), controlSwitchItem.getPortNumber());
+                controlDeviceItems.put(controlSwitchItem.getIpAddress(), (IRoomDevice) ledWallRepository);
+            }
+        }
     }
 
     public void switchControl(ControlSwitchItem controlSwitchItem) {
+
+        IRoomDevice roomDevice = controlDeviceItems.get(controlSwitchItem.getIpAddress());
+
+        if (roomDevice instanceof LEDWallRepository) {
+            ((LEDWallRepository) roomDevice).setPreset(1);
+        }
+
+        if (roomDevice instanceof LGTVRepository ) {
+            ((LGTVRepository) roomDevice).turnOn();
+        }
     }
 
     public void connectDevice(RoomDevice roomDevice) {
@@ -225,5 +296,20 @@ public class MasterPanelViewModel extends ViewModel {
     protected void onCleared() {
         super.onCleared();
         cleanup();
+    }
+
+    public void updateControlSwitchItemsStatus() {
+
+        devices.forEach(device -> {
+            if (device != null) {
+                if (device instanceof LGTVRepository) {
+                    ((ITVRepository) device).getStatus();
+                }
+
+                if (device instanceof LEDWallRepository) {
+                    ((ILEDWallRepository) device).getStatus();
+                }
+            }
+        });
     }
 }

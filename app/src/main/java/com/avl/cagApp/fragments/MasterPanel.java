@@ -54,7 +54,7 @@ public class MasterPanel extends Fragment {
     private CountDownTimer warmupTimer;
     private View layoutWarmup;
     private TextView txtWarmupCountdown;
-    private List<Integer> selectedOutput;
+//    private List<Integer> selectedOutput;
 
     public static MasterPanel newInstance() {
         return new MasterPanel();
@@ -126,7 +126,6 @@ public class MasterPanel extends Fragment {
         layoutVideo = view.findViewById(R.id.layout_master_video);
         layoutControl = view.findViewById(R.id.layout_master_control);
 
-
         btnVideo = view.findViewById(R.id.btn_video);
         btnControl = view.findViewById(R.id.btn_control);
         btnHome = view.findViewById(R.id.btn_home);
@@ -183,7 +182,7 @@ public class MasterPanel extends Fragment {
     }
 
     private void setupOutputDisplay(View view) {
-        selectedOutput = new ArrayList<>();
+//        selectedOutput = new ArrayList<>();
         rvOutput = view.findViewById(R.id.rv_display_output);
 
         GridLayoutManager layoutManager = new GridLayoutManager(requireContext(),8, GridLayoutManager.VERTICAL,false);
@@ -194,26 +193,28 @@ public class MasterPanel extends Fragment {
     private void setupControlSwitch(View view) {
         rvControl = view.findViewById(R.id.rv_control_switch);
         controlSwitchItems = new ArrayList<>();
-        controlSwitchItems.add(new ControlSwitchItem("HALL 1 LED Wall", false, 1));
-        controlSwitchItems.add(new ControlSwitchItem("Briefing Room 1", false, 2));
-        controlSwitchItems.add(new ControlSwitchItem("Training Room LED", false, 3));
-        controlSwitchItems.add(new ControlSwitchItem("CAG Meeting Room", false, 4));
-        controlSwitchItems.add(new ControlSwitchItem("Airline Room 1", false,5));
-        controlSwitchItems.add(new ControlSwitchItem("HALL 2 Front LED WALL", false, 6));
-        controlSwitchItems.add(new ControlSwitchItem("Briefing Room 2", false, 7));
-        controlSwitchItems.add(new ControlSwitchItem("CAG OPS Room Front Left", false, 8));
-        controlSwitchItems.add(new ControlSwitchItem("PMA Holding Room", false, 9));
-        controlSwitchItems.add(new ControlSwitchItem("Airline Room 2", false, 10));
-        controlSwitchItems.add(new ControlSwitchItem("HALL 2 Side LED WALL", false, 11));
-        controlSwitchItems.add(new ControlSwitchItem("Boardroom Front LED", false, 12));
-        controlSwitchItems.add(new ControlSwitchItem("CAG OPS Room Front Right", false, 13));
-        controlSwitchItems.add(new ControlSwitchItem("Police OPS Room", false, 14));
-        controlSwitchItems.add(new ControlSwitchItem("CARE OPS Room Front", false, 15));
-        controlSwitchItems.add(new ControlSwitchItem("Temp", false, 0));
-        controlSwitchItems.add(new ControlSwitchItem("Boardroom Side LED", false, 16));
-        controlSwitchItems.add(new ControlSwitchItem("CAG OPS Room Side Left", false, 17));
-        controlSwitchItems.add(new ControlSwitchItem("CID OPS Room", false, 18));
-        controlSwitchItems.add(new ControlSwitchItem("CARE OPS Room Side", false, 19));
+        controlSwitchItems.add(new ControlSwitchItem("HALL 1 LED Wall", false, 1, "192.168.1.152", 15200, "LED_WALL"));
+        controlSwitchItems.add(new ControlSwitchItem("Briefing Room 1", false, 2,  "192.168.1.122", 9761, "TV"));
+        controlSwitchItems.add(new ControlSwitchItem("Training Room LED", false, 3, "192.168.1.122", 15200, "LED_WALL"));
+        controlSwitchItems.add(new ControlSwitchItem("CAG Meeting Room", false, 4, "192.168.1.52", 9761, "TV"));
+        controlSwitchItems.add(new ControlSwitchItem("Airline Room 1", false,5, "192.168.1.12", 9761, "TV"));
+        controlSwitchItems.add(new ControlSwitchItem("HALL 2 Front LED WALL", false, 6, "192.168.1.162", 15200, "LED_WALL"));
+        controlSwitchItems.add(new ControlSwitchItem("Briefing Room 2", false, 7, "192.168.1.132", 9761, "TV"));
+        controlSwitchItems.add(new ControlSwitchItem("CAG OPS Room Front Left", false, 8, "192.168.1.112", 9761, "TV"));
+        controlSwitchItems.add(new ControlSwitchItem("PMA Holding Room", false, 9, "192.168.1.162", 9761, "TV"));
+        controlSwitchItems.add(new ControlSwitchItem("Airline Room 2", false, 10, "192.168.1.21", 9761, "TV"));
+        controlSwitchItems.add(new ControlSwitchItem("HALL 2 Side LED WALL", false, 11, "192.168.1.163", 15200, "LED_WALL"));
+        controlSwitchItems.add(new ControlSwitchItem("Boardroom Front LED", false, 12, "192.168.1.92", 15200, "LED_WALL"));
+        controlSwitchItems.add(new ControlSwitchItem("CAG OPS Room Front Right", false, 13, "192.168.1.113", 9761, "TV"));
+        controlSwitchItems.add(new ControlSwitchItem("Police OPS Room", false, 14, "192.168.1.72", 9761, "TV"));
+        controlSwitchItems.add(new ControlSwitchItem("CARE OPS Room Front", false, 15, "192.168.1.32", 9761, "TV"));
+        controlSwitchItems.add(new ControlSwitchItem("Temp", false, 0, "", 0, ""));
+        controlSwitchItems.add(new ControlSwitchItem("Boardroom Side LED", false, 16, "192.168.1.93", 15200, "LED_WALL"));
+        controlSwitchItems.add(new ControlSwitchItem("CAG OPS Room Side Left", false, 17, "192.168.1.114", 9761, "TV"));
+        controlSwitchItems.add(new ControlSwitchItem("CID OPS Room", false, 18, "192.168.1.82", 9761, "TV"));
+        controlSwitchItems.add(new ControlSwitchItem("CARE OPS Room Side", false, 19, "192.168.1.34", 9761, "TV"));
+
+        mViewModel.setControlSwitchItems(controlSwitchItems);
 
         GridLayoutManager layoutManager = new GridLayoutManager(requireContext(),5, GridLayoutManager.VERTICAL,false);
         rvControl.setLayoutManager(layoutManager);
@@ -222,10 +223,11 @@ public class MasterPanel extends Fragment {
             mViewModel.switchControl(item);
         });
         rvControl.setAdapter(adapter);
+
+//        mViewModel.updateControlSwitchItemsStatus();
     }
 
     private void observerViewModel() {
-
 
         mViewModel.getIsSystemInitialized().observe(getViewLifecycleOwner(), isInitialized -> {
             if (!isInitialized) {
@@ -251,7 +253,6 @@ public class MasterPanel extends Fragment {
             if (controlRoomDevices != null) {
                 tvRoomName.setText(controlRoomDevices.controlDevice.getRoomName());
                 if (controlRoomDevices.roomDevices != null) {
-
                     controlRoomDevices.roomDevices.forEach(roomDevice -> {
                         mViewModel.connectDevice(roomDevice);
                     });
@@ -298,7 +299,7 @@ public class MasterPanel extends Fragment {
                             return;
                         }
 
-                        selectedOutput.add(item.getPortNumber());
+//                        selectedOutput.add(item.getPortNumber());
 
                         // on Selected item
                         mViewModel.routeSourceToDevice(buttonInputSelected, item);

@@ -207,6 +207,11 @@ public class LGTVRepository implements ITVRepository, IRoomDevice {
     }
 
     @Override
+    public void getStatus() {
+        tcpClient.sendMessage("ka 01 ff\r");
+    }
+
+    @Override
     public void setRoomDevice(RoomDevice roomDevice) {
         this.roomDevice = roomDevice;
     }

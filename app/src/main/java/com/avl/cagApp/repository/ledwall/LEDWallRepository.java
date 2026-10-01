@@ -63,6 +63,11 @@ public class LEDWallRepository implements ILEDWallRepository, IRoomDevice {
     }
 
     @Override
+    public void getStatus() {
+
+    }
+
+    @Override
     public void connect(String ip, int port) {
         tcpClient.connect(ip, port);
     }

@@ -11,6 +11,7 @@ public interface ITVRepository {
     void setMute(boolean mute);
 //    void connect(String ip, int port);
 //    void disconnect();
+    void getStatus();
     void setListener(ITVListener listener);
 //    void cleanup();
 }
