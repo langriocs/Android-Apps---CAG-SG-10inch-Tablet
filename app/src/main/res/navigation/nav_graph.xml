@@ -30,6 +30,9 @@
         <action
             android:id="@+id/action_splashScreen1_to_hallPanel"
             app:destination="@id/hallPanel" />
+        <action
+            android:id="@+id/action_splashScreen1_to_briefingPanel"
+            app:destination="@id/briefingPanel" />
     </fragment>
     <fragment
         android:id="@+id/controlScreen1"
@@ -72,4 +75,9 @@
         android:name="com.avl.cag10inchApp.fragments.HallPanel"
         android:label="fragment_hall_panel"
         tools:layout="@layout/fragment_hall_panel" />
+    <fragment
+        android:id="@+id/briefingPanel"
+        android:name="com.avl.cag10inchApp.fragments.BriefingPanel"
+        android:label="fragment_briefing_panel"
+        tools:layout="@layout/fragment_briefing_panel" />
 </navigation>

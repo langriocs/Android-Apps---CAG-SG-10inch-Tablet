@@ -77,7 +77,7 @@ public class SplashScreen extends Fragment {
     private void proceedToNextScreen(View v) {
 
         if (controlDeviceUI == AppConstant.UI_1) {
-            Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_controlScreen1);
+            Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_briefingPanel);
         }
         if (controlDeviceUI == AppConstant.UI_2) {
             Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_controlScreen2);
