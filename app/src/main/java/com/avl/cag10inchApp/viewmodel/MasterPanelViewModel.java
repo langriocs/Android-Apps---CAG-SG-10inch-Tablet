@@ -309,7 +309,6 @@ public class MasterPanelViewModel extends ViewModel {
             @Override
             public void onDisconnected() {
                 isTVConnected.postValue(false);
-
             }
 
             @Override

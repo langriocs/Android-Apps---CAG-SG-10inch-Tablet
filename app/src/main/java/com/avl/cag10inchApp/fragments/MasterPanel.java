@@ -42,6 +42,7 @@ public class MasterPanel extends Fragment {
     private List<DisplayOutputItem> displayOutputItems;
     private List<ControlSwitchItem> controlSwitchItems;
     private Integer buttonInputSelected = 0;
+    private String sourceSelected="";
 
     private final Map<Integer, View> inputButtons = new HashMap<>();
 
@@ -94,6 +95,7 @@ public class MasterPanel extends Fragment {
 
     private void setSelectedInput(Integer selectedInput) {
         buttonInputSelected = selectedInput;
+
 
         inputButtons.forEach((key, buttonView) -> {
             boolean isSelected = (Objects.equals(key, selectedInput));
@@ -197,6 +199,13 @@ public class MasterPanel extends Fragment {
             if (buttonInputSelected == null || buttonInputSelected == 0) {
                 return;
             }
+
+            sourceSelected = inputTable(buttonInputSelected);
+            item.setSource(sourceSelected);
+            displayOutputAdapter.updateSource(item.getDeviceId(), sourceSelected);
+
+//            displayOutputAdapter.notifyItemChanged(displayOutputItems.indexOf(item));
+
             mViewModel.routeSourceToDevice(buttonInputSelected, item);
 
             setSelectedInput(0);
@@ -204,6 +213,52 @@ public class MasterPanel extends Fragment {
 
         rvOutput.setAdapter(displayOutputAdapter);
 
+    }
+
+    private String inputTable(int input){
+        if (input == 1) {
+            return "Hall 1 USB-C 1";
+        }
+        if (input == 2) {
+            return "Hall 1 USB-C 2";
+        }
+        if (input == 3) {
+            return "Hall 1 Wireless";
+        }
+        if (input == 4) {
+            return "Hall 2 USB-C 1";
+        }
+        if (input == 5) {
+            return "Hall 2 USB-C 2";
+        }
+        if (input == 6) {
+            return "Hall 2 Wireless";
+        }
+        if (input == 7) {
+            return "CAG USB-C 1";
+        }
+        if (input == 8) {
+            return "CAG USB-C 2";
+        }
+        if (input == 9) {
+            return "CAG USB-C 3";
+        }
+        if (input == 10) {
+            return "CAG Wireless 1";
+        }
+        if (input == 11) {
+            return "CAG Wireless 2";
+        }
+        if (input == 12) {
+            return "CAG StarHub";
+        }
+        if (input == 13) {
+            return "CAG Apple TV";
+        }
+        if (input == 14) {
+            return "CAG CCTV";
+        }
+        return "";
     }
 
     private void setupControlSwitch(View view) {

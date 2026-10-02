@@ -54,6 +54,7 @@ public class DisplayOutputAdapter extends RecyclerView.Adapter<ItemViewHolder> {
             holder.txtItem.setTextColor(Color.WHITE);
         }
 
+        holder.txtDeviceType.setText(item.getSource());
         holder.imgItem.setImageResource(item.getImgResId());
         holder.txtItem.setText(item.getDisplayName());
         holder.getView().setOnClickListener(view -> {
@@ -76,5 +77,22 @@ public class DisplayOutputAdapter extends RecyclerView.Adapter<ItemViewHolder> {
     @Override
     public int getItemCount() {
         return displayOutputItems.size();
+    }
+
+    public void updateSource(int deviceId, String source) {
+
+        for (int i = 0; i < displayOutputItems.size(); i++) {
+
+            DisplayOutputItem item = displayOutputItems.get(i);
+
+            if (item.getDeviceId() == deviceId) {
+
+                item.setSource(source);
+
+                notifyItemChanged(i);
+
+                break;
+            }
+        }
     }
 }

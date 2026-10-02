@@ -86,7 +86,7 @@ public class Switch32x32Repository implements ISwitchRepository, IRoomDevice {
     @Override
     public void routeAV(Integer selectedInput, Integer selectedOutput) {
 //        String selOutput = parseSelectedOutput(selectedOutput);
-        tcpClient.sendMessage("s in " + selectedInput.toString() + " av out " + selectedOutput.toString() +"! \r");
+        tcpClient.sendMessage("s in " + selectedInput.toString() + " av out " + selectedOutput.toString() +"!\r");
     }
 
     @Override

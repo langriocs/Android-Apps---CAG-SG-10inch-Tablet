@@ -12,6 +12,7 @@ import com.avl.cag10inchApp.R;
 public class ItemViewHolder extends RecyclerView.ViewHolder {
     ImageView imgItem;
     TextView txtItem;
+    TextView txtDeviceType;
     View _itemView;
 
 
@@ -20,6 +21,7 @@ public class ItemViewHolder extends RecyclerView.ViewHolder {
         _itemView = itemView;
         imgItem = itemView.findViewById(R.id.imgDisplay);
         txtItem = itemView.findViewById(R.id.txtDisplay);
+        txtDeviceType = itemView.findViewById(R.id.txtDeviceType);
     }
 
     public View getView() { return _itemView; }

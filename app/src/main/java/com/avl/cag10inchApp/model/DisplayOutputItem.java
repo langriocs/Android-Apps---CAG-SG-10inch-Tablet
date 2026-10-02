@@ -12,6 +12,7 @@ public class DisplayOutputItem {
     private String deviceType;
     private RoomDevice roomDevice;
     private boolean powerOn;
+    private String source="";
 
 
     public DisplayOutputItem(int deviceId, String displayName, int imgResId, int portNumber, String deviceType, RoomDevice roomDevice ) {
@@ -61,4 +62,11 @@ public class DisplayOutputItem {
     }
 
 
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
 }
