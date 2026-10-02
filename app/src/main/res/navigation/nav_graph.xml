@@ -79,5 +79,9 @@
         android:id="@+id/briefingPanel"
         android:name="com.avl.cag10inchApp.fragments.BriefingPanel"
         android:label="fragment_briefing_panel"
-        tools:layout="@layout/fragment_briefing_panel" />
+        tools:layout="@layout/fragment_briefing_panel" >
+        <action
+            android:id="@+id/action_briefingPanel_to_splashScreen1"
+            app:destination="@id/splashScreen1" />
+    </fragment>
 </navigation>
