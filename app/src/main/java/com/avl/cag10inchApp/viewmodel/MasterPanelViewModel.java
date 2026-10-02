@@ -132,7 +132,7 @@ public class MasterPanelViewModel extends ViewModel {
         }
 
         if (roomDevice instanceof DSPRepository) {
-            ((DSPRepository) roomDevice).setMute();
+//            ((DSPRepository) roomDevice).setMute();
         }
     }
 

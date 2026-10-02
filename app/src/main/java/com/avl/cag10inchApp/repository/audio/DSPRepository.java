@@ -11,6 +11,7 @@ public class DSPRepository implements IDSPRepository, IRoomDevice {
     private volatile IAudioListener listener;
     private final TCPClient tcpClient;
     private RoomDevice roomDevice;
+    private int channel;
 
 
     public DSPRepository() {
@@ -72,8 +73,18 @@ public class DSPRepository implements IDSPRepository, IRoomDevice {
     }
 
     @Override
-    public void setMute() {
-        tcpClient.sendMessage("GICM O 0000 00 NC 0 \r");
+    public void setChannel(int channel) {
+        this.channel = channel;
+    }
+
+    @Override
+    public void setVolume(int faderValue) {
+        tcpClient.sendMessage("SICL S 0000 00 NC "+ channel +","+ faderValue +" \r");
+    }
+
+    @Override
+    public void setMute(int value) {
+        tcpClient.sendMessage("SICM S 0000 00 NC "+ channel +","+ value +" \r");
     }
 
     @Override

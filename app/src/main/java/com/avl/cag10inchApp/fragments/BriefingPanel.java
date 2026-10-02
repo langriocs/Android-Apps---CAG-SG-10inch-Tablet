@@ -21,28 +21,31 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.avl.cag10inchApp.model.vo.ControlDevice;
+import com.avl.cag10inchApp.model.vo.ControlRoomDevices;
 import com.avl.cag10inchApp.repository.tv.TVPowerState;
 import com.avl.cag10inchApp.viewmodel.BriefingPanelViewModel;
 import com.avl.cag10inchApp.R;
-import com.avl.cag10inchApp.viewmodel.ControlScreenViewModel;
 import com.avl.cag10inchApp.viewmodel.ShareViewModel;
 import com.google.android.material.button.MaterialButton;
 
 public class BriefingPanel extends Fragment {
 
-    private ControlScreenViewModel mViewModel;
+    private BriefingPanelViewModel mViewModel;
     private ShareViewModel mShareModel;
     private CountDownTimer warmupTimer;
     private int volNum = 32;
     boolean isTVConnected = false;
     boolean isSwitcherConnected = false;
     TVPowerState powerState = TVPowerState.UNKNOWN;
+    int source;
+    int output;
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mViewModel = new ViewModelProvider(requireActivity()).get(ControlScreenViewModel.class);
+        mViewModel = new ViewModelProvider(requireActivity()).get(BriefingPanelViewModel.class);
         mShareModel = new ViewModelProvider(requireActivity()).get(ShareViewModel.class);
     }
 
@@ -71,32 +74,24 @@ public class BriefingPanel extends Fragment {
 
 
         btnSourceUsbC.setOnClickListener(v -> {
-            mViewModel.routeInputSourceToUSB();
+            fetchSourceHDMI();
+            mViewModel.routeInputSourceTo(source, output);
+
         });
 
         btnSourceWireless.setOnClickListener(v -> {
-            mViewModel.routeInputSourceToWireless();
+            fetchSourceWireless();
+            mViewModel.routeInputSourceToWireless(source, output);
         } );
 
         btnPower.setOnClickListener(v -> {
-//            if (powerState == TVPowerState.ON) {
-//                mViewModel.turnOffTV();
-//            }
-//            if (powerState == TVPowerState.OFF) {
-//                mViewModel.turnOnTV();
-//            }
-//
-//            if (powerState == TVPowerState.UNKNOWN) {
-//                mViewModel.turnOnTV();
-//            }
-
             mViewModel.turnOffTV();
             performShutdown();
             Navigation.findNavController(v).navigate(R.id.action_briefingPanel_to_splashScreen1);
         });
 
         btnMute.setOnClickListener(v -> {
-            Boolean current = mViewModel.getTVMuted().getValue();
+            Boolean current = mViewModel.getDSPMuted().getValue();
             mViewModel.changeMute(current == null || !current);
         });
 
@@ -114,7 +109,9 @@ public class BriefingPanel extends Fragment {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 int volume = seekBar.getProgress();
-                mViewModel.changeVolume(volume);
+
+                int mappedValue = 311 + (volume * 2);
+                mViewModel.changeVolume(mappedValue);
             }
         });
 
@@ -123,14 +120,21 @@ public class BriefingPanel extends Fragment {
         TextView txtWarmupCountdown = view.findViewById(R.id.txtWarmupCountdown);
 
         mShareModel.getControlRoomDevices().observe(getViewLifecycleOwner(), controlRoomDevices -> {
+
             if (controlRoomDevices != null) {
                 tvRoomName.setText(controlRoomDevices.controlDevice.getRoomName());
+
+                int channel = fetchChannelByRoomId(controlRoomDevices.controlDevice.getId());
+
                 if (controlRoomDevices.roomDevices != null) {
                     controlRoomDevices.roomDevices.forEach(roomDevice -> {
                         if (roomDevice.getDeviceName().equals("Switch")) {
                             mViewModel.connectSwitcher(roomDevice.getDeviceIpAddress(), roomDevice.getDevicePort());
                         } else if (roomDevice.getDeviceName().equals("TV")) {
                             mViewModel.connectTV(roomDevice.getDeviceIpAddress(), roomDevice.getDevicePort());
+                        } else if (roomDevice.getDeviceName().equals("DSP")) {
+                            mViewModel.connectDSP(roomDevice.getDeviceIpAddress(), roomDevice.getDevicePort(), channel);
+
                         }
                     });
                 }
@@ -138,31 +142,6 @@ public class BriefingPanel extends Fragment {
         });
 
         mViewModel.getTvPowerState().observe(getViewLifecycleOwner(), state -> {
-
-//            if (state == TVPowerState.UNKNOWN) {
-//                return;
-//            }
-//
-//            powerState = state;
-//
-//            int color = 0xFFFF0000;
-//            if (state == TVPowerState.ON) {
-//                color = 0xFF4CAF50;
-//                btnPower.setIconTint(android.content.res.ColorStateList.valueOf(color));
-//                btnPower.setBackgroundResource(R.drawable.bg_rounded_card_green );
-//                btnPower.setText("Turn display off");
-//
-//                setLEDDisplayStatus(imgDisplayIndicator, txtDisplayStatus, TVPowerState.ON);
-//            }
-//
-//            if (state == TVPowerState.OFF) {
-//                color = 0xFFFF0000;
-//                btnPower.setIconTint(android.content.res.ColorStateList.valueOf(color));
-//                btnPower.setBackgroundResource( R.drawable.bg_rounded_card_red );
-//                btnPower.setText("Turn display on");
-//
-//                setLEDDisplayStatus(imgDisplayIndicator,txtDisplayStatus, TVPowerState.OFF);
-//            }
         });
 
         mViewModel.getIsUsbCSelected().observe(getViewLifecycleOwner(), isSelected -> {
@@ -174,17 +153,27 @@ public class BriefingPanel extends Fragment {
         });
 
         mViewModel.getTVMuted().observe(getViewLifecycleOwner(), isMuted -> {
-
             btnMute.setBackgroundResource(isMuted ? R.drawable.bg_rounded_card_selected : R.drawable.bg_rounded_card);
-
             btnMute.setIconResource(isMuted ? R.drawable.ic_volume_down : R.drawable.ic_volume_mute );
-
         });
 
         mViewModel.getTVVolume().observe(getViewLifecycleOwner(), volume -> {
             if (volume != null) {
                 seekBarVolume.setProgress(volume);
             }
+        });
+
+        mViewModel.getDSPMuted().observe(getViewLifecycleOwner(), isMuted -> {
+            btnMute.setBackgroundResource(isMuted ? R.drawable.bg_rounded_card_selected : R.drawable.bg_rounded_card);
+            btnMute.setIconResource(isMuted ? R.drawable.ic_volume_down : R.drawable.ic_volume_mute );
+        });
+
+        mViewModel.getDSPVolume().observe(getViewLifecycleOwner(), volume -> {
+
+        });
+
+        mViewModel.getIsDSPConnected().observe(getViewLifecycleOwner(), isConnected -> {
+
         });
 
         mViewModel.getIsSystemInitialized().observe(getViewLifecycleOwner(), isInitialized -> {
@@ -219,13 +208,49 @@ public class BriefingPanel extends Fragment {
         });
     }
 
+    private int fetchChannelByRoomId(int roomId) {
+        if (roomId == 12) {
+            return 0;
+        }
+        if (roomId == 13) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    private void fetchSourceHDMI() {
+        ControlDevice controlDevice = mShareModel.getSelectedControlDevice();
+
+        if (controlDevice.getId() == 12) { // Briefing Rm 1
+            source = 1;
+            output = 1;
+        }
+        if (controlDevice.getId() == 13) { // Briefing Rm 2
+            source = 3;
+            output = 2;
+        }
+
+    }
+    private void fetchSourceWireless() {
+        ControlDevice controlDevice = mShareModel.getSelectedControlDevice();
+
+        if (controlDevice.getId() == 12) { // Briefing Rm 1
+            source = 2;
+            output = 1;
+        }
+        if (controlDevice.getId() == 13) { // Briefing Rm 2
+            source = 4;
+            output = 2;
+        }
+    }
+
     private void showAlert() {
         CustomAlertDialog alertScreenDialog = new CustomAlertDialog();
         alertScreenDialog.setTitle("Changi Airport Group");
         alertScreenDialog.setMessage("Device IP Address not found! Please contact the admin.");
         alertScreenDialog.show(getParentFragmentManager(), "alert dialog");
     }
-
 
     private void startWarmup(View layoutWarmup, TextView txtWarmupCountdown) {
         layoutWarmup.setVisibility(View.VISIBLE);

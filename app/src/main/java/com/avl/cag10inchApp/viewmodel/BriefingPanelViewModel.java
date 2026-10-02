@@ -1,11 +1,17 @@
 package com.avl.cag10inchApp.viewmodel;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.avl.cag10inchApp.repository.IRoomDevice;
+import com.avl.cag10inchApp.repository.audio.DSPRepository;
+import com.avl.cag10inchApp.repository.audio.IAudioListener;
+import com.avl.cag10inchApp.repository.audio.IDSPRepository;
 import com.avl.cag10inchApp.repository.switcher.ISwitchListener;
+import com.avl.cag10inchApp.repository.switcher.Switch32x32Repository;
 import com.avl.cag10inchApp.repository.switcher.Switch5x1Output;
 import com.avl.cag10inchApp.repository.switcher.Switch5x1Repository;
 import com.avl.cag10inchApp.repository.tv.ITVListener;
@@ -19,19 +25,25 @@ public class BriefingPanelViewModel extends ViewModel {
     private final MutableLiveData<TVPowerState> tvState = new MutableLiveData<>(TVPowerState.OFF);
     private final MutableLiveData<Boolean> isUsbCSelected = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> isWirelessSelected = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> isDSPConnected = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> tvMuted = new MutableLiveData<>(false);
     private final MutableLiveData<String> tvMessage = new MutableLiveData<>("");
     private final MutableLiveData<Integer> tvVolume = new MutableLiveData<>(50);
-
+    private final MutableLiveData<Integer> dspVolume = new MutableLiveData<>(411);
+    private final MutableLiveData<Boolean> dspMuted = new MutableLiveData<>(false);
 
     private final IRoomDevice tvRepository;
     private final IRoomDevice switchRepository;
+    private final IRoomDevice dspRepository;
+
 
     public BriefingPanelViewModel () {
         tvRepository = new LGTVRepository();
-        switchRepository = new Switch5x1Repository();
+        switchRepository = new Switch32x32Repository();
+        dspRepository = new DSPRepository();
         setupTVListener();
         setupSwitchListener();
+        setupDSPListener();
     }
 
     public LiveData<Boolean> getIsSystemInitialized() { return isSystemInitialized; }
@@ -77,6 +89,18 @@ public class BriefingPanelViewModel extends ViewModel {
         return tvVolume;
     }
 
+    public LiveData<Integer> getDSPVolume() {
+        return dspVolume;
+    }
+
+    public LiveData<Boolean> getDSPMuted() {
+        return dspMuted;
+    }
+
+    public LiveData<Boolean> getIsDSPConnected() {
+        return isDSPConnected;
+    }
+
     // TV setup
     private void setupTVListener() {
         ((LGTVRepository) tvRepository).setListener(new ITVListener() {
@@ -116,6 +140,15 @@ public class BriefingPanelViewModel extends ViewModel {
         tvRepository.connect(ip, port);
     }
 
+    public void connectSwitcher(String ip, int port) {
+        switchRepository.connect(ip, port);
+    }
+
+    public void connectDSP(String ip, int port, int channel) {
+        dspRepository.connect(ip, port);
+        ((IDSPRepository) dspRepository).setChannel(channel);
+    }
+
     public void turnOnTV() {
         ((LGTVRepository) tvRepository).turnOn();
     }
@@ -125,16 +158,21 @@ public class BriefingPanelViewModel extends ViewModel {
     }
 
     public void changeMute(boolean isMute) {
-        ((LGTVRepository) tvRepository).setMute(isMute);
+//        ((LGTVRepository) tvRepository).setMute(isMute);
+        ((DSPRepository) dspRepository).setMute(isMute ? 1 : 0);
+        dspMuted.postValue(isMute);
     }
 
     public void changeVolume(int volume) {
-        ((LGTVRepository) tvRepository).setVolume(volume);
+        //((LGTVRepository) tvRepository).setVolume(volume);
+        ((DSPRepository) dspRepository).setVolume(volume);
+        dspVolume.postValue(volume);
+
     }
 
     // Switch setup
     private void setupSwitchListener() {
-        ((Switch5x1Repository) switchRepository).setListener(new ISwitchListener() {
+        ((Switch32x32Repository) switchRepository).setListener(new ISwitchListener() {
             @Override
             public void onConnected() {
                 isSwitcherConnected.postValue(true);
@@ -147,24 +185,55 @@ public class BriefingPanelViewModel extends ViewModel {
         });
     }
 
-    public void connectSwitcher(String ip, int port) {
-        switchRepository.connect(ip, port);
-    }
     public void disconnectSwitcher() {
         switchRepository.disconnect();
     }
-    public void routeInputSourceToUSB() {
+
+    public void routeInputSourceTo(int source, int output ) {
         isUsbCSelected.postValue(true);
         isWirelessSelected.postValue(false);
-        ((Switch5x1Repository) switchRepository).routeInputSourceTo(Switch5x1Output.USB_1);
+        ((Switch32x32Repository) switchRepository).routeAV(source, output);
     }
 
-    public void routeInputSourceToWireless() {
+    public void routeInputSourceToWireless(int source, int output) {
         isUsbCSelected.postValue(false);
         isWirelessSelected.postValue(true);
-        ((Switch5x1Repository) switchRepository).routeInputSourceTo(Switch5x1Output.HDMI_4);
+        ((Switch32x32Repository) switchRepository).routeAV(source, output);
     }
 
+    public void setupDSPListener() {
+        ((DSPRepository) dspRepository).setListener(new IAudioListener() {
+            @Override
+            public void onConnected() {
+                isDSPConnected.postValue(true);
+            }
+
+            @Override
+            public void onDisconnected() {
+                isDSPConnected.postValue(false);
+            }
+
+            @Override
+            public void onVolumeChanged(int volume) {
+
+            }
+
+            @Override
+            public void onMuteChanged(boolean isMuted) {
+
+            }
+
+            @Override
+            public void setListener(IAudioListener listener) {
+
+            }
+
+            @Override
+            public void onError(String message) {
+
+            }
+        });
+    }
 
     @Override
     protected void onCleared() {
