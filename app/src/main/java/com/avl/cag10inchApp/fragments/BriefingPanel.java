@@ -41,7 +41,6 @@ public class BriefingPanel extends Fragment {
     int source;
     int output;
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,7 +70,8 @@ public class BriefingPanel extends Fragment {
         ImageView imgDisplayIndicator = view.findViewById(R.id.imgStatusIndicator);
         TextView txtDisplayStatus = view.findViewById(R.id.txtDisplayStatus);
         SeekBar seekBarVolume = view.findViewById(R.id.seekBarVolume);
-
+        ImageView imgVolDown = view.findViewById(R.id.imgVolDown);
+        ImageView imgVolUp = view.findViewById(R.id.imgVolUp);
 
         btnSourceUsbC.setOnClickListener(v -> {
             fetchSourceHDMI();
@@ -95,6 +95,14 @@ public class BriefingPanel extends Fragment {
             mViewModel.changeMute(current == null || !current);
         });
 
+        imgVolDown.setOnClickListener(v -> {
+            mViewModel.changeVolume(volNum - 1);
+        });
+
+        imgVolUp.setOnClickListener(v -> {
+            mViewModel.changeVolume(volNum + 1);
+        });
+
         seekBarVolume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -108,9 +116,9 @@ public class BriefingPanel extends Fragment {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                int volume = seekBar.getProgress();
+                volNum = seekBar.getProgress();
 
-                int mappedValue = 311 + (volume * 2);
+                int mappedValue = 311 + (volNum * 2);
                 mViewModel.changeVolume(mappedValue);
             }
         });
@@ -134,7 +142,6 @@ public class BriefingPanel extends Fragment {
                             mViewModel.connectTV(roomDevice.getDeviceIpAddress(), roomDevice.getDevicePort());
                         } else if (roomDevice.getDeviceName().equals("DSP")) {
                             mViewModel.connectDSP(roomDevice.getDeviceIpAddress(), roomDevice.getDevicePort(), channel);
-
                         }
                     });
                 }
