@@ -16,9 +16,6 @@
         android:label="fragment_splash_screen"
         tools:layout="@layout/fragment_splash_screen" >
         <action
-            android:id="@+id/action_splashScreen1_to_controlScreen1"
-            app:destination="@id/controlScreen1" />
-        <action
             android:id="@+id/action_splashScreen1_to_controlScreen2"
             app:destination="@id/controlScreen2" />
         <action
@@ -33,14 +30,17 @@
         <action
             android:id="@+id/action_splashScreen1_to_briefingPanel"
             app:destination="@id/briefingPanel" />
+        <action
+            android:id="@+id/action_splashScreen1_to_cagopsPanel"
+            app:destination="@id/cagopsPanel" />
     </fragment>
     <fragment
-        android:id="@+id/controlScreen1"
-        android:name="com.avl.cag10inchApp.fragments.ControlScreen1"
-        android:label="fragment_control_screen1"
-        tools:layout="@layout/fragment_control_screen1" >
+        android:id="@+id/cagopsPanel"
+        android:name="com.avl.cag10inchApp.fragments.CAGOPSPanel"
+        android:label="fragment_cagops_panel"
+        tools:layout="@layout/fragment_cagops_panel">
         <action
-            android:id="@+id/action_controlScreen1_to_splashScreen1"
+            android:id="@+id/action_cagopsPanel_to_splashScreen1"
             app:destination="@id/splashScreen1" />
     </fragment>
     <fragment

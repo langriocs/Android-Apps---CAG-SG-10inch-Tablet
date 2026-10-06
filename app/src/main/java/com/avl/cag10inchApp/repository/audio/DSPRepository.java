@@ -78,7 +78,8 @@ public class DSPRepository implements IDSPRepository, IRoomDevice {
     }
 
     @Override
-    public void setVolume(int faderValue) {
+    public void setVolume(int volume) {
+        int faderValue = 311 + (volume * 2);
         tcpClient.sendMessage("SICL S 0000 00 NC "+ channel +","+ faderValue +" \r");
     }
 

@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class MasterPanel extends Fragment {
 
@@ -192,7 +191,7 @@ public class MasterPanel extends Fragment {
         GridLayoutManager layoutManager = new GridLayoutManager(requireContext(),8, GridLayoutManager.VERTICAL,false);
         rvOutput.setLayoutManager(layoutManager);
 
-        displayOutputAdapter = new DisplayOutputAdapter(displayOutputItems, item -> {
+        displayOutputAdapter = new DisplayOutputAdapter(item -> {
             if (item == null) {
                 return;
             }
@@ -201,10 +200,7 @@ public class MasterPanel extends Fragment {
             }
 
             sourceSelected = inputTable(buttonInputSelected);
-            item.setSource(sourceSelected);
-            displayOutputAdapter.updateSource(item.getDeviceId(), sourceSelected);
-
-//            displayOutputAdapter.notifyItemChanged(displayOutputItems.indexOf(item));
+            item.setSelectedSourceName(sourceSelected);
 
             mViewModel.routeSourceToDevice(buttonInputSelected, item);
 
@@ -321,12 +317,6 @@ public class MasterPanel extends Fragment {
     }
 
     private void fetchControlDevicesData() {
-        if (displayOutputItems != null) {
-            displayOutputItems.clear();
-            displayOutputItems = null;
-        }
-
-        displayOutputItems = new ArrayList<>();
         mShareModel.getControlRoomDevices().observe(getViewLifecycleOwner(), controlRoomDevices -> {
             if (controlRoomDevices == null) {
                 return;
@@ -340,12 +330,21 @@ public class MasterPanel extends Fragment {
                 tvRoomName.setText(controlRoomDevices.controlDevice.getRoomName());
             }
 
-//            connect
-            for(RoomDevice roomDevice : controlRoomDevices.roomDevices) {
-                mViewModel.connectDevice(roomDevice);
+            if (displayOutputItems != null) {
+                displayOutputItems.clear();
+                displayOutputItems = null;
             }
 
-            mViewModel.setRoomDevices(controlRoomDevices.roomDevices);
+            displayOutputItems = new ArrayList<>();
+
+//          populate dto to model
+            for(RoomDevice roomDevice : controlRoomDevices.roomDevices) {
+                DisplayOutputItem displayOutputItem = new DisplayOutputItem(roomDevice, R.drawable.ic_output);
+                displayOutputItem.setDeviceStatusVisible(false);
+                displayOutputItems.add(displayOutputItem);
+            }
+
+            mViewModel.connectAllDevices(displayOutputItems);
 
         });
     }

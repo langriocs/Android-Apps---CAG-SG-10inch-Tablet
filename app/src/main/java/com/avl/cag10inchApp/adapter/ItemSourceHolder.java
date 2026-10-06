@@ -9,21 +9,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.avl.cag10inchApp.R;
 
-public class ItemViewHolder extends RecyclerView.ViewHolder {
-    ImageView imgItem;
-    TextView txtItem;
-    TextView txtDeviceType;
+
+public class ItemSourceHolder extends RecyclerView.ViewHolder {
+
+    ImageView imgItem = itemView.findViewById(R.id.imgDisplay);
+    TextView txtItem = itemView.findViewById(R.id.txtDisplay);
     View _itemView;
-    View viewConnectionState;
 
-
-    public ItemViewHolder(@NonNull View itemView) {
+    public ItemSourceHolder(@NonNull View itemView) {
         super(itemView);
         _itemView = itemView;
         imgItem = itemView.findViewById(R.id.imgDisplay);
         txtItem = itemView.findViewById(R.id.txtDisplay);
-        txtDeviceType = itemView.findViewById(R.id.txtDeviceType);
-        viewConnectionState = itemView.findViewById(R.id.viewConnectState);
+
     }
 
     public View getView() { return _itemView; }

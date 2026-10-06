@@ -193,7 +193,7 @@ public class LGTVRepository implements ITVRepository, IRoomDevice {
     @Override
     public void setMute(boolean mute) {
         String data = mute ? "00" : "01";
-        tcpClient.sendMessage("ke 00 "+ data + "\r");
+        tcpClient.sendMessage("ke 01 "+ data + "\r");
     }
 
     @Override

@@ -68,11 +68,11 @@ public class SplashScreen extends Fragment {
             }
         });
 
-        final String ipAddress = "192.168.1.120";
-//        final String ipAddress = "192.168.1.131";
-//        final String ipAddress = MyLibUtil.getIPAddress(true);
+//        final String ipAddress = "192.168.1.110"; // CAG OPS
+//        final String ipAddress = "192.168.1.131"; // Master
+//        final String ipAddress = "192.168.1.130"; // Briefing
+        final String ipAddress = MyLibUtil.getIPAddress(true);
         shareViewModel.fetchControlDeviceByIpAddress(ipAddress);
-        isFourPanel = shareViewModel.isFourInchPanel();
     }
 
     private void proceedToNextScreen(View v) {
@@ -81,7 +81,7 @@ public class SplashScreen extends Fragment {
             Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_briefingPanel);
         }
         if (controlDeviceUI == AppConstant.UI_2) {
-            Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_controlScreen2);
+            Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_cagopsPanel);
         }
         if (controlDeviceUI == AppConstant.UI_3) {
             Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_controlScreen3);

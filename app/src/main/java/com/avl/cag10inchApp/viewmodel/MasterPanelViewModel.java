@@ -1,13 +1,15 @@
 package com.avl.cag10inchApp.viewmodel;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.avl.cag10inchApp.R;
 import com.avl.cag10inchApp.model.ControlSwitchItem;
 import com.avl.cag10inchApp.model.DisplayOutputItem;
 import com.avl.cag10inchApp.model.vo.RoomDevice;
+import com.avl.cag10inchApp.repository.DeviceConnectionState;
 import com.avl.cag10inchApp.repository.IRoomDevice;
 import com.avl.cag10inchApp.repository.audio.DSPRepository;
 import com.avl.cag10inchApp.repository.audio.IDSPRepository;
@@ -40,10 +42,10 @@ public class MasterPanelViewModel extends ViewModel {
     private final Map<String, IRoomDevice> controlDeviceItems = new HashMap<>();
     private ISwitchRepository parentSwitch;
 
+    private List<DisplayOutputItem> deviceOutputItems = new ArrayList<>();
+
     public MasterPanelViewModel() {
-//        setupSwitchListener();
-//        setupLEDListener();
-//        setupTVListener();
+
     }
 
     public LiveData<Boolean> getIsSwitcherConnected() {
@@ -67,48 +69,6 @@ public class MasterPanelViewModel extends ViewModel {
         this.isSystemInitialized.postValue(initialized);
     }
 
-    public void setRoomDevices(List<RoomDevice> roomDevices) {
-        if (roomDevices == null) {
-            displayOutputItems.setValue(new ArrayList<>());
-            return;
-        }
-
-        List<DisplayOutputItem> items = new ArrayList<>();
-
-        for (RoomDevice roomDevice : roomDevices) {
-            if ((roomDevice == null) || roomDevice.getDeviceName() == null) {
-                continue;
-            }
-
-            String deviceName = roomDevice.getDeviceName();
-            boolean validDevice = deviceName.equals("LED_WALL") ||
-                    deviceName.equals("LED_AUDIO") ||
-                    deviceName.equals("TV") ||
-                    deviceName.equals("Switch") && (roomDevice.getParentId() > 0);
-
-
-            if (!validDevice) {
-                continue;
-            }
-
-            DisplayOutputItem item =
-                    new DisplayOutputItem(
-                            roomDevice.getId(),
-                            roomDevice.getDeviceDesc(),
-                            R.drawable.ic_display,
-                            roomDevice.getOutPort(),
-                            roomDevice.getDeviceName(),
-                            roomDevice
-                    );
-
-            items.add(item);
-        }
-
-        displayOutputItems.setValue(items);
-
-
-    }
-
     public void routeSourceToDevice(int selectedInput, DisplayOutputItem selectedOutput) {
 
         if (parentSwitch == null) {
@@ -116,7 +76,7 @@ public class MasterPanelViewModel extends ViewModel {
         }
 
 //        route AV Hall Matrix to selected output
-        parentSwitch.routeAV(selectedInput, selectedOutput.getPortNumber());
+        parentSwitch.routeAV(selectedInput, selectedOutput.getOutportNumber());
 
         IRoomDevice roomDevice = outputDevices.get(selectedOutput.getDeviceId());
         if (roomDevice instanceof LEDWallRepository) {
@@ -215,50 +175,51 @@ public class MasterPanelViewModel extends ViewModel {
         }
     }
 
-    public void connectDevice(RoomDevice displayOutputItem) {
-        if (displayOutputItem == null || displayOutputItem.getDeviceName() == null) {
-            return;
+    public void connectAllDevices(List<DisplayOutputItem> displayOutputItems) {
+
+        for (DisplayOutputItem item : displayOutputItems) {
+            if (item.getDisplayName().equals("Switch")) {
+                item.setRoomDevice(connectSwitcher(item.getDeviceIp(), item.getDevicePort()));
+            } else if (item.getDisplayName().equals("TV")) {
+                item.setRoomDevice(connectTV(item));
+            } else if (item.getDisplayName().equals("LED_WALL")) {
+                item.setRoomDevice(connectLEDWall(item.getDeviceIp(), item.getDevicePort()));
+            } else if (item.getDisplayName().equals("LED_AUDIO")) {
+                item.setRoomDevice(connectDSP(item.getDeviceId(), item.getDeviceIp(), item.getDevicePort()));
+            }
         }
 
-        if (displayOutputItem.getDeviceName().equals("Switch")) {
-            connectSwitcher(displayOutputItem);
-        } else if (displayOutputItem.getDeviceName().equals("TV")) {
-            connectTV(displayOutputItem);
-        } else if (displayOutputItem.getDeviceName().equals("LED_WALL")) {
-            connectLEDWall(displayOutputItem);
-        } else if (displayOutputItem.getDeviceName().equals("LED_AUDIO")) {
-            connectDSP(displayOutputItem);
-        }
+        this.displayOutputItems.postValue(displayOutputItems);
     }
 
-    private void connectDSP(RoomDevice roomDevice) {
+    private IRoomDevice connectDSP(int id, String ip, int port) {
         IRoomDevice ledAudioRepository = new DSPRepository();
         ((IDSPRepository) ledAudioRepository).setListener(new ILEDWallListener() {
 
             @Override
             public void onConnected() {
-                isLEDConnected.postValue(true);
+                updateConnectionState( id, DeviceConnectionState.CONNECTED);
             }
 
             @Override
             public void onDisconnected() {
-                isLEDConnected.postValue(false);
+                updateConnectionState( id, DeviceConnectionState.DISCONNECTED);
             }
         });
 
+        ledAudioRepository.connect(ip, port);
 
-        ledAudioRepository.connect(roomDevice.getDeviceIpAddress(), roomDevice.getDevicePort());
-        ledAudioRepository.setRoomDevice(roomDevice);
-        outputDevices.put(roomDevice.getId(), ledAudioRepository);
+        return ledAudioRepository;
     }
 
-    private void connectSwitcher(RoomDevice roomDevice) {
+    private IRoomDevice connectSwitcher(String ip, int port) {
         IRoomDevice switchRepository = new Switch32x32Repository();
         ((ISwitchRepository) switchRepository).setListener(new ISwitchListener() {
 
             @Override
             public void onConnected() {
                 isSwitcherConnected.postValue(true);
+
             }
 
             @Override
@@ -267,16 +228,13 @@ public class MasterPanelViewModel extends ViewModel {
             }
         });
 
-        switchRepository.connect(roomDevice.getDeviceIpAddress(), roomDevice.getDevicePort());
-        switchRepository.setRoomDevice(roomDevice);
-        if (roomDevice.getParentId() == 0) {
-            parentSwitch = (ISwitchRepository) switchRepository;
-        } else {
-            outputDevices.put(roomDevice.getId(), switchRepository);
-        }
+        switchRepository.connect(ip, port);
+
+        return switchRepository;
+
     }
 
-    private void connectLEDWall(RoomDevice roomDevice) {
+    private IRoomDevice connectLEDWall(String ip, int port) {
         IRoomDevice ledWallRepository = new LEDWallRepository();
         ((ILEDWallRepository) ledWallRepository).setListener(new ILEDWallListener() {
 
@@ -291,30 +249,30 @@ public class MasterPanelViewModel extends ViewModel {
             }
         });
 
-        ledWallRepository.connect(roomDevice.getDeviceIpAddress(), roomDevice.getDevicePort());
-        ledWallRepository.setRoomDevice(roomDevice);
-        outputDevices.put(roomDevice.getId(), ledWallRepository);
+        ledWallRepository.connect(ip, port);
+
+        return ledWallRepository;
     }
 
-    private void connectTV(RoomDevice roomDevice) {
+    private IRoomDevice connectTV(DisplayOutputItem item) {
         IRoomDevice tvRepository = new LGTVRepository();
         ((ITVRepository) tvRepository).setListener(new ITVListener() {
 
             @Override
             public void onConnected() {
-                isTVConnected.postValue(true);
-                ((ITVRepository) tvRepository).getStatus();
+                updateConnectionState(item.getDeviceId(), DeviceConnectionState.CONNECTED);
+                Log.d("cag", "TV connected " + item.getDeviceIp());
             }
 
             @Override
             public void onDisconnected() {
-                isTVConnected.postValue(false);
+                updateConnectionState(item.getDeviceId(), DeviceConnectionState.DISCONNECTED);
             }
 
             @Override
             public void onPowerStateChanged(TVPowerState state) {
-                boolean isOn = state == TVPowerState.ON;
-                updateDisplayPowerState(roomDevice.getId(), isOn);
+//                boolean isOn = state == TVPowerState.ON;
+//                updateDisplayPowerState(roomDevice.getId(), isOn);
             }
 
             @Override
@@ -323,6 +281,7 @@ public class MasterPanelViewModel extends ViewModel {
 
             @Override
             public void onMuteChanged(boolean isMuted) {
+//                this.isMuted.postValue(isMuted);
             }
 
             @Override
@@ -330,10 +289,34 @@ public class MasterPanelViewModel extends ViewModel {
             }
         });
 
-        tvRepository.setRoomDevice(roomDevice);
-        tvRepository.connect(roomDevice.getDeviceIpAddress(), roomDevice.getDevicePort());
+        updateConnectionState(item.getDeviceId(), DeviceConnectionState.CONNECTING);
+        tvRepository.connect(item.getDeviceIp(), item.getDevicePort());
 
-        outputDevices.put(roomDevice.getId(), tvRepository);
+        return tvRepository;
+
+    }
+
+    private void updateConnectionState(int deviceId, DeviceConnectionState state) {
+
+        List<DisplayOutputItem> currentItems = displayOutputItems.getValue();
+
+        if (currentItems == null) {
+            return;
+        }
+
+        List<DisplayOutputItem> updatedItems = new ArrayList<>(currentItems);
+
+        for (DisplayOutputItem item : updatedItems) {
+            if (item.getDeviceId() == deviceId) {
+                item.setConnectionState(state);
+                break;
+            }
+
+        }
+
+        displayOutputItems.postValue(updatedItems);
+
+
     }
 
     private void updateDisplayPowerState(int deviceId, boolean powerOn) {
@@ -345,13 +328,13 @@ public class MasterPanelViewModel extends ViewModel {
 
         List<DisplayOutputItem> updatedItems = new ArrayList<>(currentItems);
 
-        for (DisplayOutputItem item : updatedItems) {
-            if (item.getDeviceId() == deviceId) {
-                item.setPowerOn(powerOn);
-                break;
-            }
-
-        }
+//        for (DisplayOutputItem item : updatedItems) {
+//            if (item.getDeviceId() == deviceId) {
+//                item.setPowerOn(powerOn);
+//                break;
+//            }
+//
+//        }
 
         displayOutputItems.postValue(updatedItems);
     }
@@ -366,18 +349,4 @@ public class MasterPanelViewModel extends ViewModel {
         cleanup();
     }
 
-//    public void updateControlSwitchItemsStatus() {
-//
-//        devices.forEach(device -> {
-//            if (device != null) {
-//                if (device instanceof LGTVRepository) {
-//                    ((ITVRepository) device).getStatus();
-//                }
-//
-//                if (device instanceof LEDWallRepository) {
-//                    ((ILEDWallRepository) device).getStatus();
-//                }
-//            }
-//        });
-//    }
 }

@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.GridLayoutManager;
 
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
@@ -96,11 +97,21 @@ public class BriefingPanel extends Fragment {
         });
 
         imgVolDown.setOnClickListener(v -> {
-            mViewModel.changeVolume(volNum - 1);
+            if (volNum > 0) {
+                volNum = seekBarVolume.getProgress();
+                volNum--;
+                seekBarVolume.setProgress(volNum);
+                mViewModel.changeVolume(volNum);
+            }
         });
 
         imgVolUp.setOnClickListener(v -> {
-            mViewModel.changeVolume(volNum + 1);
+            if (volNum < 100) {
+                volNum = seekBarVolume.getProgress();
+                volNum++;
+                seekBarVolume.setProgress(volNum);
+                mViewModel.changeVolume(volNum);
+            }
         });
 
         seekBarVolume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -122,6 +133,8 @@ public class BriefingPanel extends Fragment {
                 mViewModel.changeVolume(mappedValue);
             }
         });
+
+
 
         // Warmup UI components
         View layoutWarmup = view.findViewById(R.id.layoutWarmup);

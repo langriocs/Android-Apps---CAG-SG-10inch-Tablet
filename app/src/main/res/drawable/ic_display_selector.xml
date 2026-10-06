@@ -3,8 +3,6 @@
 
     <item
         android:state_selected="true"
-        android:drawable="@drawable/bg_rounded_card_selected" />
-    <item
-        android:drawable="@drawable/bg_rounded_card" />
-
+        android:drawable="@drawable/ic_display_selected" />
+    <item android:drawable="@drawable/ic_display" />
 </selector>

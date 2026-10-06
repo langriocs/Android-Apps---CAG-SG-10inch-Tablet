@@ -30,6 +30,7 @@ public class ShareViewModel extends AndroidViewModel {
         controlRoomDevices = Transformations.switchMap(ipAddressQuery, deviceRoomRepo::fetchControlDeviceWithRoomDevicesByIpAddress);
     }
 
+
     public LiveData<ControlRoomDevices> getControlRoomDevices() {
         return controlRoomDevices;
     }

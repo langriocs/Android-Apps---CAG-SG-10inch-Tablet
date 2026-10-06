@@ -3,12 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="120dp"
     android:layout_height="110dp"
-    android:background="@android:color/transparent">
+    android:clickable="true"
+    android:focusable="true" >
     <ImageView
         android:id="@+id/imgDisplay"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_display"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:src="@drawable/ic_display_selector"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -21,7 +25,7 @@
         android:textColor="@color/white"
         android:textSize="14sp"
         android:textStyle="bold"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="-24dp"
         app:layout_constraintTop_toTopOf="@id/imgDisplay"
         app:layout_constraintBottom_toBottomOf="@id/imgDisplay"
         app:layout_constraintStart_toStartOf="@id/imgDisplay"
@@ -33,9 +37,22 @@
         android:layout_height="wrap_content"
         android:textColor="@color/white"
         android:textSize="14sp"
+        android:layout_marginTop="-20dp"
         app:layout_constraintTop_toBottomOf="@id/imgDisplay"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <View
+        android:id="@+id/viewConnectState"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="14dp"
+        android:background="@drawable/bg_connect_selector"
+        android:contentDescription="Display connected LED indicator"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 

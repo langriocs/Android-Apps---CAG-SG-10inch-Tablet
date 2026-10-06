@@ -7,7 +7,6 @@
     <style name="usb_source_button">
         <item name="cornerRadius">10dp</item>
         <item name="backgroundTint">@color/usb_button_tint</item>
-        <item name="icon">@drawable/usb_c_src</item>
         <item name="android:insetLeft">0dp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetRight">0dp</item>
@@ -20,7 +19,6 @@
     <style name="wireless_source_button">
         <item name="cornerRadius">10dp</item>
         <item name="backgroundTint">@color/usb_button_tint</item>
-        <item name="icon">@drawable/wireless_display_src</item>
         <item name="android:insetLeft">0dp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetRight">0dp</item>
@@ -32,7 +30,6 @@
 
     <style name="power_off_button">
         <item name="cornerRadius">10dp</item>
-        <item name="icon">@drawable/pwr_off</item>
         <item name="android:insetLeft">0dp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetRight">0dp</item>
@@ -44,7 +41,6 @@
 
     <style name="power_on_button">
         <item name="cornerRadius">10dp</item>
-        <item name="icon">@drawable/pwr_on</item>
         <item name="android:insetLeft">0dp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetRight">0dp</item>
@@ -81,7 +77,6 @@
     <style name="poly_source_button">
         <item name="cornerRadius">10dp</item>
         <item name="backgroundTint">@color/usb_button_tint</item>
-        <item name="icon">@drawable/poly_src</item>
         <item name="android:insetLeft">0dp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetRight">0dp</item>

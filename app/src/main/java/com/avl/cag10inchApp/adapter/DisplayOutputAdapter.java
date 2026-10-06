@@ -10,17 +10,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.avl.cag10inchApp.R;
 import com.avl.cag10inchApp.model.DisplayOutputItem;
+import com.avl.cag10inchApp.model.DisplaySourceItem;
+import com.avl.cag10inchApp.repository.DeviceConnectionState;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DisplayOutputAdapter extends RecyclerView.Adapter<ItemViewHolder> {
 
-    private List<DisplayOutputItem> displayOutputItems = new ArrayList<>();
+    private List<DisplayOutputItem> displayOutputItems;
     private IDisplayOutputListener listener;
+    private int selectedDeviceId = -1;
 
-    public DisplayOutputAdapter(List<DisplayOutputItem> displayOutputItems, IDisplayOutputListener listener) {
-        this.displayOutputItems = displayOutputItems;
+    public DisplayOutputAdapter(IDisplayOutputListener listener) {
+        this.displayOutputItems = new ArrayList<>();
         this.listener = listener;
     }
 
@@ -30,7 +33,6 @@ public class DisplayOutputAdapter extends RecyclerView.Adapter<ItemViewHolder> {
         } else {
             displayOutputItems = new ArrayList<>(items);
         }
-
         notifyDataSetChanged();
     }
 
@@ -46,17 +48,22 @@ public class DisplayOutputAdapter extends RecyclerView.Adapter<ItemViewHolder> {
     public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
         DisplayOutputItem item = displayOutputItems.get(position);
 
-        if (item.isPowerOn()) {
-            holder.txtItem.setTextColor(Color.RED);
-//            holder.getView().setBackgroundResource(R.drawable.bg_rounded_card_selected);
+        holder.txtDeviceType.setText(item.getDisplayName());
+        holder.imgItem.setImageResource(item.getImgResId());
+        holder.txtItem.setText(item.getDescription());
+        holder.getView().setSelected(item.getDeviceId() == selectedDeviceId);
+
+        DeviceConnectionState state = item.getConnectionState();
+
+        if (item.isDeviceStatusVisible()) {
+            holder.viewConnectionState.setVisibility(View.VISIBLE);
         } else {
-//            holder.getView().setBackgroundResource(R.drawable.bg_rounded_card);
-            holder.txtItem.setTextColor(Color.WHITE);
+            holder.viewConnectionState.setVisibility(View.GONE);
         }
 
-        holder.txtDeviceType.setText(item.getSource());
-        holder.imgItem.setImageResource(item.getImgResId());
-        holder.txtItem.setText(item.getDisplayName());
+
+        holder.viewConnectionState.setSelected(state == DeviceConnectionState.CONNECTED);
+
         holder.getView().setOnClickListener(view -> {
             int currentPosition = holder.getBindingAdapterPosition();
 
@@ -64,10 +71,11 @@ public class DisplayOutputAdapter extends RecyclerView.Adapter<ItemViewHolder> {
                 return;
             }
 
-            DisplayOutputItem clickedItem =  displayOutputItems.get(currentPosition);
+            DisplayOutputItem selItem = displayOutputItems.get(currentPosition);
+            setSelectedDevice(selItem.getDeviceId());
 
             if (listener != null) {
-                listener.onDisplayOutputItemClick(clickedItem);
+                listener.onDisplayOutputItemClick(displayOutputItems.get(currentPosition));
             }
 
         });
@@ -79,20 +87,31 @@ public class DisplayOutputAdapter extends RecyclerView.Adapter<ItemViewHolder> {
         return displayOutputItems.size();
     }
 
-    public void updateSource(int deviceId, String source) {
+    public void setSelectedDevice(int deviceId) {
+        int oldPosition = -1;
+        int newPosition = -1;
 
         for (int i = 0; i < displayOutputItems.size(); i++) {
 
             DisplayOutputItem item = displayOutputItems.get(i);
 
-            if (item.getDeviceId() == deviceId) {
-
-                item.setSource(source);
-
-                notifyItemChanged(i);
-
-                break;
+            if (item.getDeviceId() == selectedDeviceId) {
+                oldPosition = i;
             }
+
+            if (item.getDeviceId() == deviceId) {
+                newPosition = i;
+            }
+        }
+
+        selectedDeviceId = deviceId;
+
+        if (oldPosition != -1) {
+            notifyItemChanged(oldPosition);
+        }
+
+        if (newPosition != -1 && newPosition != oldPosition) {
+            notifyItemChanged(newPosition);
         }
     }
 }
