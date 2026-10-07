@@ -13,6 +13,7 @@ public class ItemViewHolder extends RecyclerView.ViewHolder {
     ImageView imgItem;
     TextView txtItem;
     TextView txtDeviceType;
+    TextView txtSource;
     View _itemView;
     View viewConnectionState;
 
@@ -24,6 +25,7 @@ public class ItemViewHolder extends RecyclerView.ViewHolder {
         txtItem = itemView.findViewById(R.id.txtDisplay);
         txtDeviceType = itemView.findViewById(R.id.txtDeviceType);
         viewConnectionState = itemView.findViewById(R.id.viewConnectState);
+        txtSource = itemView.findViewById(R.id.txtSource);
     }
 
     public View getView() { return _itemView; }

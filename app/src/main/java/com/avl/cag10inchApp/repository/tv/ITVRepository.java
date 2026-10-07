@@ -13,5 +13,7 @@ public interface ITVRepository {
 //    void disconnect();
     void getStatus();
     void setListener(ITVListener listener);
+
+    void changeInputSource(TVInputSource tvInputSource);
 //    void cleanup();
 }

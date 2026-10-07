@@ -17,6 +17,7 @@ public class DisplayOutputItem {
     private IRoomDevice roomDevice;
     private String selectedSourceName;
     private boolean deviceStatusVisible;
+    private boolean isTurnOn;
 
     private DeviceConnectionState connectionState = DeviceConnectionState.UNKNOWN;
 
@@ -116,5 +117,13 @@ public class DisplayOutputItem {
 
     public void setDeviceStatusVisible(boolean deviceStatusVisible) {
         this.deviceStatusVisible = deviceStatusVisible;
+    }
+
+    public boolean isTurnOn() {
+        return isTurnOn;
+    }
+
+    public void setTurnOn(boolean turnOn) {
+        isTurnOn = turnOn;
     }
 }

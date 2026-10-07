@@ -21,11 +21,14 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.avl.cag10inchApp.adapter.ControlSwitchAdapter;
 import com.avl.cag10inchApp.adapter.DisplayOutputAdapter;
 import com.avl.cag10inchApp.adapter.DisplaySourceAdapter;
+import com.avl.cag10inchApp.model.ControlSwitchItem;
 import com.avl.cag10inchApp.model.DisplayOutputItem;
 import com.avl.cag10inchApp.model.DisplaySourceItem;
 import com.avl.cag10inchApp.model.vo.RoomDevice;
+import com.avl.cag10inchApp.repository.tv.TVInputSource;
 import com.avl.cag10inchApp.viewmodel.CAGOPSPanelViewModel;
 import com.avl.cag10inchApp.R;
 import com.avl.cag10inchApp.viewmodel.ShareViewModel;
@@ -46,8 +49,11 @@ public class CAGOPSPanel extends Fragment {
     private TextView txtWarmupCountdown;
     private RecyclerView rvSelectSource;
     private RecyclerView rvSelectOutput;
+    private RecyclerView rvControlSwitch;
     private List<DisplayOutputItem> displayOutputItems;
+    private List<ControlSwitchItem> controlSwitchItems;
     private DisplayOutputAdapter displayOutputAdapter;
+    private ControlSwitchAdapter displaySwitchControlAdapter;
     private DisplaySourceItem selectedSource;
     private DisplayOutputItem selectedOutput;
     private ImageView imgVolDown;
@@ -56,6 +62,11 @@ public class CAGOPSPanel extends Fragment {
     private MaterialButton btnMute;
     private MaterialButton btnPower;
     private int volNum;
+    private View layoutVideo;
+    private View layoutControl;
+    private View btnVideo;
+    private View btnControl;
+    private View btnHome;
 
     public static CAGOPSPanel newInstance() {
         return new CAGOPSPanel();
@@ -81,6 +92,7 @@ public class CAGOPSPanel extends Fragment {
         tvRoomName = view.findViewById(R.id.txtRoomName);
         rvSelectSource = view.findViewById(R.id.rv_select_source);
 
+
         imgVolDown = view.findViewById(R.id.imgVolDown);
         imgVolUp = view.findViewById(R.id.imgVolUp);
         seekBarVolume = view.findViewById(R.id.seekBarVolume);
@@ -96,7 +108,9 @@ public class CAGOPSPanel extends Fragment {
 
         setupSourceDisplay(view);
         setupOutputDisplay(view);
-        setupControl();
+        setupSwitchControlDisplay(view);
+        setupModeNavigation(view);
+        setupAudioControl();
         observerViewModel();
         fetchControlDevicesData();
 
@@ -125,6 +139,7 @@ public class CAGOPSPanel extends Fragment {
                     .collect(Collectors.toList());
 
             displayOutputAdapter.setItems(items);
+            displaySwitchControlAdapter.setItems(items);
         });
 
         mViewModel.getSelectedDeviceOutput().observe(getViewLifecycleOwner(), selectedOutput -> {
@@ -145,17 +160,20 @@ public class CAGOPSPanel extends Fragment {
 
     private void setupSourceDisplay(View v) {
         List<DisplaySourceItem> inputSources = new ArrayList<>();
-        inputSources.add(new DisplaySourceItem("HDMI", 0, R.drawable.ic_wireless_share));
-        inputSources.add( new DisplaySourceItem("HDMI", 7, R.drawable.ic_wireless_share));
-        inputSources.add( new DisplaySourceItem("HDMI", 8, R.drawable.ic_starhub));
-        inputSources.add( new DisplaySourceItem("HDMI", 9, R.drawable.ic_appletv));
-        inputSources.add(new DisplaySourceItem("Wireless", 10, R.drawable.ic_wireless_share));
-        inputSources.add( new DisplaySourceItem("Wireless", 11, R.drawable.ic_wireless_share));
-        inputSources.add( new DisplaySourceItem("Star Hub", 12, R.drawable.ic_starhub));
-        inputSources.add( new DisplaySourceItem("Apple TV", 13, R.drawable.ic_appletv));
+        inputSources.add(new DisplaySourceItem("USB-C 1", 7, R.drawable.ic_usb_c, false));
+        inputSources.add( new DisplaySourceItem("USB-C 2", 8, R.drawable.ic_usb_c, false));
+        inputSources.add( new DisplaySourceItem("USB-C 3", 9, R.drawable.ic_usb_c, false));
+        inputSources.add( new DisplaySourceItem("Wireless Share 1", 10, R.drawable.ic_wireless_share, false));
+        inputSources.add(new DisplaySourceItem("Wireless Share 2", 11, R.drawable.ic_wireless_share, false));
+        inputSources.add( new DisplaySourceItem("Apple TV", 13, R.drawable.ic_appletv, false));
+        inputSources.add( new DisplaySourceItem("Star Hub", 12, R.drawable.ic_starhub, false));
+        inputSources.add( new DisplaySourceItem("HDMI Direct 1", 1, R.drawable.ic_usb_c, true));
+        inputSources.add( new DisplaySourceItem("HDMI Direct 2", 2, R.drawable.ic_usb_c, true));
+        inputSources.add( new DisplaySourceItem("HDMI Direct 3", 3, R.drawable.ic_usb_c, true));
+        inputSources.add( new DisplaySourceItem("HDMI Direct 4", 4, R.drawable.ic_usb_c, true));
 
         rvSelectSource = v.findViewById(R.id.rv_select_source);
-        GridLayoutManager layoutManager = new GridLayoutManager(requireContext(),3, GridLayoutManager.VERTICAL,false);
+        GridLayoutManager layoutManager = new GridLayoutManager(requireContext(),7, GridLayoutManager.VERTICAL,false);
         rvSelectSource.setLayoutManager(layoutManager);
 
         DisplaySourceAdapter adapter = new DisplaySourceAdapter(inputSources, sourceItem -> {
@@ -168,7 +186,7 @@ public class CAGOPSPanel extends Fragment {
 
     private void setupOutputDisplay(View v) {
         rvSelectOutput = v.findViewById(R.id.rv_select_output);
-        GridLayoutManager layoutManager = new GridLayoutManager(requireContext(),4, GridLayoutManager.VERTICAL,false);
+        GridLayoutManager layoutManager = new GridLayoutManager(requireContext(),8, GridLayoutManager.VERTICAL,false);
         rvSelectOutput.setLayoutManager(layoutManager);
 
         displayOutputAdapter = new DisplayOutputAdapter(item -> {
@@ -179,18 +197,32 @@ public class CAGOPSPanel extends Fragment {
                 return;
             }
 
-
             selectedOutput = item;
+            item.setSelectedSourceName(selectedSource.getDisplayName());
+            displayOutputAdapter.notifyDataSetChanged();
 
-            mViewModel.routeSourceToDevice(selectedSource, selectedOutput);
             mViewModel.setSelectedDeviceOutput(selectedOutput);
+
+            if (!selectedSource.isDirect()) { // from switch
+                mViewModel.setSelectedDeviceTurnOn();
+                mViewModel.changeTVInputSource(TVInputSource.HDMI_1);
+                mViewModel.routeSourceToDevice(selectedSource, selectedOutput);
+                mViewModel.routeAudio(selectedSource);
+            }
+
+            if (selectedSource.isDirect()) {                                    // from direct
+                mViewModel.setSelectedDeviceTurnOn();
+                mViewModel.changeTVInputSource(TVInputSource.HDMI_2);
+            }
+
+
 
         });
 
         rvSelectOutput.setAdapter(displayOutputAdapter);
     }
 
-    private void setupControl() {
+    private void setupAudioControl() {
         imgVolDown.setOnClickListener(v -> {
             if (volNum > 0) {
                 volNum = seekBarVolume.getProgress();
@@ -240,6 +272,22 @@ public class CAGOPSPanel extends Fragment {
         });
     }
 
+    private void setupSwitchControlDisplay(View v) {
+        rvControlSwitch = v.findViewById(R.id.rv_control_switch);
+        GridLayoutManager layoutManager = new GridLayoutManager(requireContext(),4, GridLayoutManager.VERTICAL,false);
+        rvControlSwitch.setLayoutManager(layoutManager);
+
+        displaySwitchControlAdapter = new ControlSwitchAdapter(item -> {
+            mViewModel.setSelectedDeviceOutput(item);
+            if (item.isTurnOn()) {
+                mViewModel.setSelectedDeviceTurnOn();
+            } else {
+                mViewModel.setSelectedDeviceTurnOff();
+            }
+        });
+        rvControlSwitch.setAdapter(displaySwitchControlAdapter);
+    }
+
     private void fetchControlDevicesData() {
         mShareModel.getControlRoomDevices().observe(getViewLifecycleOwner(), controlRoomDevices -> {
             if (controlRoomDevices == null) {
@@ -248,10 +296,6 @@ public class CAGOPSPanel extends Fragment {
 
             if (controlRoomDevices.roomDevices == null) {
                 return;
-            }
-
-            if (controlRoomDevices.controlDevice != null) {
-                tvRoomName.setText(controlRoomDevices.controlDevice.getRoomName());
             }
 
             if (displayOutputItems != null) {
@@ -270,6 +314,66 @@ public class CAGOPSPanel extends Fragment {
             mViewModel.connectAllDevices(displayOutputItems);
 
         });
+    }
+
+    private void setupModeNavigation(View view) {
+        layoutVideo = view.findViewById(R.id.layout_master_video);
+        layoutControl = view.findViewById(R.id.layout_master_control);
+
+        btnVideo = view.findViewById(R.id.btn_video);
+        btnControl = view.findViewById(R.id.btn_control);
+        btnHome = view.findViewById(R.id.btn_home);
+
+        if (btnVideo != null) {
+            btnVideo.setOnClickListener(v -> showVideoLayout());
+        }
+
+        if (btnControl != null) {
+            btnControl.setOnClickListener(v -> showControlLayout());
+        }
+
+        if (btnHome != null) {
+            btnHome.setOnClickListener(v -> {
+                mViewModel.turnOffTV();
+                Navigation.findNavController(v).navigate(R.id.action_cagopsPanel_to_splashScreen1);
+            });
+        }
+
+        showVideoLayout();
+    }
+
+    private void showVideoLayout() {
+        if (layoutVideo != null) {
+            layoutVideo.setVisibility(View.VISIBLE);
+        }
+        if (layoutControl != null) {
+            layoutControl.setVisibility(View.GONE);
+        }
+
+        updateModeButtonsHighlight(true);
+    }
+
+    private void showControlLayout() {
+        if (layoutVideo != null) {
+            layoutVideo.setVisibility(View.GONE);
+        }
+        if (layoutControl != null) {
+            layoutControl.setVisibility(View.VISIBLE);
+        }
+
+        updateModeButtonsHighlight(false);
+    }
+
+    private void updateModeButtonsHighlight(boolean isVideoMode) {
+        if (btnVideo != null) {
+            btnVideo.setSelected(isVideoMode);
+            btnVideo.setBackgroundResource(isVideoMode ? R.drawable.bg_rounded_card_selected : R.drawable.bg_rounded_card);
+        }
+
+        if (btnControl != null) {
+            btnControl.setSelected(!isVideoMode);
+            btnControl.setBackgroundResource(!isVideoMode ? R.drawable.bg_rounded_card_selected : R.drawable.bg_rounded_card);
+        }
     }
 
     private void startWarmup(View layoutWarmup, TextView txtWarmupCountdown) {

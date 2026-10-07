@@ -286,9 +286,11 @@ public class MasterPanel extends Fragment {
         GridLayoutManager layoutManager = new GridLayoutManager(requireContext(),5, GridLayoutManager.VERTICAL,false);
         rvControl.setLayoutManager(layoutManager);
 
-        ControlSwitchAdapter adapter = new ControlSwitchAdapter(controlSwitchItems, item -> {
-            mViewModel.switchControl(item);
+        ControlSwitchAdapter adapter = new ControlSwitchAdapter(item -> {
+//            mViewModel.switchControl(item);
+
         });
+
         rvControl.setAdapter(adapter);
 
 //        mViewModel.updateControlSwitchItemsStatus();

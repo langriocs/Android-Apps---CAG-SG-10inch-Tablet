@@ -227,6 +227,17 @@ public class LGTVRepository implements ITVRepository, IRoomDevice {
     }
 
     @Override
+    public void changeInputSource(TVInputSource tvInputSource) {
+        if (tvInputSource == TVInputSource.HDMI_1) {
+            tcpClient.sendMessage("xb 00 90\r");
+        }
+        if (tvInputSource == TVInputSource.HDMI_2) {
+            tcpClient.sendMessage("xb 00 91\r");
+        }
+
+    }
+
+    @Override
     public void cleanup() {
         this.listener = null;
         tcpClient.cleanup();

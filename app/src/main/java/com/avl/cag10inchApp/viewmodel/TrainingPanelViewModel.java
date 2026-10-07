@@ -12,7 +12,7 @@ import com.avl.cag10inchApp.repository.switcher.Switch5x1Repository;
 import com.avl.cag10inchApp.repository.tv.ITVListener;
 import com.avl.cag10inchApp.repository.tv.LGTVRepository;
 
-public class ControlScreenViewModel extends ViewModel {
+public class TrainingPanelViewModel extends ViewModel {
 
     private final MutableLiveData<Boolean> isSystemInitialized = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> isSwitcherConnected = new MutableLiveData<>(false);
@@ -28,7 +28,7 @@ public class ControlScreenViewModel extends ViewModel {
     private final IRoomDevice tvRepository;
     private final IRoomDevice switchRepository;
 
-    public ControlScreenViewModel () {
+    public TrainingPanelViewModel() {
         tvRepository = new LGTVRepository();
         switchRepository = new Switch5x1Repository();
         setupTVListener();

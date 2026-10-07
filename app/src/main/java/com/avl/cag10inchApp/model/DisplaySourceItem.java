@@ -4,14 +4,15 @@ public class DisplaySourceItem {
     private String displayName;
     private int portNumber;
     private int imgResId;
-
+    private boolean isDirect;
     private boolean selected = false;
 
 
-    public DisplaySourceItem(String displayName, int portNumber, int imgResId) {
+    public DisplaySourceItem(String displayName, int portNumber, int imgResId, boolean isDirect) {
         this.displayName = displayName;
         this.portNumber = portNumber;
         this.imgResId = imgResId;
+        this.isDirect = isDirect;
     }
 
     public String getDisplayName() {
@@ -44,5 +45,13 @@ public class DisplaySourceItem {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    public boolean isDirect() {
+        return isDirect;
+    }
+
+    public void setDirect(boolean direct) {
+        isDirect = direct;
     }
 }

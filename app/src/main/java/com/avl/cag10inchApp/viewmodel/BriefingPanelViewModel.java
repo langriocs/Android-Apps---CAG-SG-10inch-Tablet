@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.avl.cag10inchApp.repository.IRoomDevice;
+import com.avl.cag10inchApp.repository.audio.DSPChannel;
 import com.avl.cag10inchApp.repository.audio.DSPRepository;
 import com.avl.cag10inchApp.repository.audio.IAudioListener;
 import com.avl.cag10inchApp.repository.audio.IDSPRepository;
@@ -144,7 +145,7 @@ public class BriefingPanelViewModel extends ViewModel {
         switchRepository.connect(ip, port);
     }
 
-    public void connectDSP(String ip, int port, int channel) {
+    public void connectDSP(String ip, int port, DSPChannel channel) {
         dspRepository.connect(ip, port);
         ((IDSPRepository) dspRepository).setChannel(channel);
     }

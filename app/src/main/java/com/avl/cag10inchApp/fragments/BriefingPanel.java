@@ -24,6 +24,7 @@ import android.widget.TextView;
 
 import com.avl.cag10inchApp.model.vo.ControlDevice;
 import com.avl.cag10inchApp.model.vo.ControlRoomDevices;
+import com.avl.cag10inchApp.repository.audio.DSPChannel;
 import com.avl.cag10inchApp.repository.tv.TVPowerState;
 import com.avl.cag10inchApp.viewmodel.BriefingPanelViewModel;
 import com.avl.cag10inchApp.R;
@@ -145,7 +146,7 @@ public class BriefingPanel extends Fragment {
             if (controlRoomDevices != null) {
                 tvRoomName.setText(controlRoomDevices.controlDevice.getRoomName());
 
-                int channel = fetchChannelByRoomId(controlRoomDevices.controlDevice.getId());
+                DSPChannel channel = fetchChannelByRoomId(controlRoomDevices.controlDevice.getId());
 
                 if (controlRoomDevices.roomDevices != null) {
                     controlRoomDevices.roomDevices.forEach(roomDevice -> {
@@ -228,15 +229,15 @@ public class BriefingPanel extends Fragment {
         });
     }
 
-    private int fetchChannelByRoomId(int roomId) {
+    private DSPChannel fetchChannelByRoomId(int roomId) {
         if (roomId == 12) {
-            return 0;
+            return DSPChannel.CH_1;
         }
         if (roomId == 13) {
-            return 1;
+            return DSPChannel.CH_2;
         }
 
-        return 0;
+        return DSPChannel.CH_1;
     }
 
     private void fetchSourceHDMI() {

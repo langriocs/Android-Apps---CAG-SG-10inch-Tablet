@@ -1,7 +1,8 @@
 package com.avl.cag10inchApp.adapter;
 
-import com.avl.cag10inchApp.model.ControlSwitchItem;
+
+import com.avl.cag10inchApp.model.DisplayOutputItem;
 
 public interface IControlSwitchListener {
-    void onChangeSwitch(ControlSwitchItem item);
+    void onChangeSwitch(DisplayOutputItem item);
 }

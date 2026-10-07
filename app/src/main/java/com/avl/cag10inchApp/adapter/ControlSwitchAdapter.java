@@ -11,16 +11,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.avl.cag10inchApp.R;
 import com.avl.cag10inchApp.model.ControlSwitchItem;
+import com.avl.cag10inchApp.model.DisplayOutputItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ControlSwitchAdapter extends RecyclerView.Adapter<ItemControlHolder> {
 
-    private List<ControlSwitchItem> controlSwitchItems;
+    private List<DisplayOutputItem> controlSwitchItems;
     private IControlSwitchListener listener;
 
-    public ControlSwitchAdapter(List<ControlSwitchItem> controlSwitchItems, IControlSwitchListener listener) {
-        this.controlSwitchItems = controlSwitchItems;
+    public ControlSwitchAdapter(IControlSwitchListener listener) {
         this.listener = listener;
     }
 
@@ -34,15 +35,21 @@ public class ControlSwitchAdapter extends RecyclerView.Adapter<ItemControlHolder
     @Override
     public void onBindViewHolder(@NonNull ItemControlHolder holder, int position) {
 
-        ControlSwitchItem item = controlSwitchItems.get(position);
-        if (item.getOutportNumber() == 0) {
-            holder.itemView.setVisibility(GONE);
-            return;
-        }
-        holder.txtItem.setText(item.getDisplayName());
-        holder.controlSwitch.setChecked(item.getState());
+        DisplayOutputItem item = controlSwitchItems.get(position);
+
+        holder.controlSwitch.setOnCheckedChangeListener(null);
+        holder.txtItem.setText(item.getDescription());
+        holder.controlSwitch.setChecked(item.isTurnOn());
         holder.controlSwitch.setOnCheckedChangeListener((compoundButton, b) -> {
-            item.setState(b);
+            if (!compoundButton.isPressed()) {
+                return;
+            }
+
+            if (item.isTurnOn() == b) {
+                return;
+            }
+
+            item.setTurnOn(b);
             this.listener.onChangeSwitch(item);
         });
     }
@@ -50,5 +57,14 @@ public class ControlSwitchAdapter extends RecyclerView.Adapter<ItemControlHolder
     @Override
     public int getItemCount() {
         return controlSwitchItems.size();
+    }
+
+    public void setItems(List<DisplayOutputItem> items) {
+        if (items == null) {
+            controlSwitchItems = new ArrayList<>();
+        } else {
+            controlSwitchItems = new ArrayList<>(items);
+        }
+        notifyDataSetChanged();
     }
 }

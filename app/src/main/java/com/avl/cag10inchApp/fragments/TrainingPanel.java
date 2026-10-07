@@ -13,12 +13,12 @@ import android.view.ViewGroup;
 import com.avl.cag10inchApp.R;
 import com.avl.cag10inchApp.viewmodel.ControlScreen2ViewModel;
 
-public class ControlScreen2 extends Fragment {
+public class TrainingPanel extends Fragment {
 
     private ControlScreen2ViewModel mViewModel;
 
-    public static ControlScreen2 newInstance() {
-        return new ControlScreen2();
+    public static TrainingPanel newInstance() {
+        return new TrainingPanel();
     }
 
     @Override

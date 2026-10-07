@@ -11,7 +11,7 @@ public class DSPRepository implements IDSPRepository, IRoomDevice {
     private volatile IAudioListener listener;
     private final TCPClient tcpClient;
     private RoomDevice roomDevice;
-    private int channel;
+    private DSPChannel channel;
 
 
     public DSPRepository() {
@@ -73,7 +73,7 @@ public class DSPRepository implements IDSPRepository, IRoomDevice {
     }
 
     @Override
-    public void setChannel(int channel) {
+    public void setChannel(DSPChannel channel) {
         this.channel = channel;
     }
 

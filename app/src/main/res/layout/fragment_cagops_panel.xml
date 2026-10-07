@@ -65,73 +65,28 @@
         app:layout_constraintTop_toBottomOf="@+id/header">
 
         <!-- Source Buttons container -->
-        <LinearLayout
-            android:id="@+id/leftPanel"
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="24dp"
-            android:orientation="vertical"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/rightPanel">
+            app:layout_constraintEnd_toEndOf="parent"  >
 
-            <!-- Select source title -->
-            <TextView
-                android:id="@+id/lblSelectSource"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/select_source"
-                android:textColor="#E0E0E0"
-                android:textSize="32sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/display_status_panel" />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <include
+                android:id="@+id/layout_cagops_video"
+                layout="@layout/fragment_cagops_panel_video"
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:background="@drawable/bg_rounded_card">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_select_source"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
-                />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/select_output"
-                android:textSize="32sp"
-                android:textColor="#E0E0E0"
-                />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_height="match_parent"
+                android:visibility="visible" />
+            <include
+                android:id="@+id/layout_master_control"
+                layout="@layout/fragment_cagops_panel_control"
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:background="@drawable/bg_rounded_card">
+                android:layout_height="match_parent"
+                android:visibility="gone" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_select_output"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
-                    />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-        </LinearLayout>
+        </FrameLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/rightPanel"
@@ -139,7 +94,7 @@
             android:layout_height="0dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintEnd_toEndOf="parent" android:visibility="gone">
 
             <!-- Volume Section label -->
             <TextView
@@ -180,78 +135,78 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
             <!-- Volume Controls Box -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/volume_controls_panel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/btnPower" >
+<!--            <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--                android:id="@+id/volume_controls_panel"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginBottom="32dp"-->
+<!--                android:layout_marginStart="16dp"-->
+<!--                android:layout_marginEnd="16dp"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintBottom_toTopOf="@+id/btnPower" >-->
 
-                <ImageView
-                    android:id="@+id/imgVolDown"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:src="@drawable/ic_volume_down"
-                    android:clickable="true"
-                    android:contentDescription="Volume Down icon"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/volume_controls_panel"
-                    app:layout_constraintBottom_toBottomOf="@id/volume_controls_panel"/>
+<!--                <ImageView-->
+<!--                    android:id="@+id/imgVolDown"-->
+<!--                    android:layout_width="72dp"-->
+<!--                    android:layout_height="72dp"-->
+<!--                    android:src="@drawable/ic_volume_down"-->
+<!--                    android:clickable="true"-->
+<!--                    android:contentDescription="Volume Down icon"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toTopOf="@+id/volume_controls_panel"-->
+<!--                    app:layout_constraintBottom_toBottomOf="@id/volume_controls_panel"/>-->
 
-                <SeekBar
-                    android:id="@+id/seekBarVolume"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:max="100"
-                    android:progress="50"
-                    android:progressDrawable="@drawable/seekbar_progress"
-                    android:thumb="@drawable/seekbar_thumb"
-                    app:layout_constraintBottom_toBottomOf="@id/volume_controls_panel"
-                    app:layout_constraintEnd_toStartOf="@+id/imgVolUp"
-                    app:layout_constraintStart_toEndOf="@+id/imgVolDown"
-                    app:layout_constraintTop_toTopOf="@id/volume_controls_panel" />
+<!--                <SeekBar-->
+<!--                    android:id="@+id/seekBarVolume"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:max="100"-->
+<!--                    android:progress="50"-->
+<!--                    android:progressDrawable="@drawable/seekbar_progress"-->
+<!--                    android:thumb="@drawable/seekbar_thumb"-->
+<!--                    app:layout_constraintBottom_toBottomOf="@id/volume_controls_panel"-->
+<!--                    app:layout_constraintEnd_toStartOf="@+id/imgVolUp"-->
+<!--                    app:layout_constraintStart_toEndOf="@+id/imgVolDown"-->
+<!--                    app:layout_constraintTop_toTopOf="@id/volume_controls_panel" />-->
 
-                <ImageView
-                    android:id="@+id/imgVolUp"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:layout_marginEnd="20dp"
-                    android:src="@drawable/ic_volume_up"
-                    android:clickable="true"
-                    android:contentDescription="@string/volume_up_icon"
-                    app:layout_constraintBottom_toBottomOf="@id/volume_controls_panel"
-                    app:layout_constraintEnd_toStartOf="@+id/btnMute"
-                    app:layout_constraintTop_toTopOf="@+id/volume_controls_panel" />
+<!--                <ImageView-->
+<!--                    android:id="@+id/imgVolUp"-->
+<!--                    android:layout_width="72dp"-->
+<!--                    android:layout_height="72dp"-->
+<!--                    android:layout_marginEnd="20dp"-->
+<!--                    android:src="@drawable/ic_volume_up"-->
+<!--                    android:clickable="true"-->
+<!--                    android:contentDescription="@string/volume_up_icon"-->
+<!--                    app:layout_constraintBottom_toBottomOf="@id/volume_controls_panel"-->
+<!--                    app:layout_constraintEnd_toStartOf="@+id/btnMute"-->
+<!--                    app:layout_constraintTop_toTopOf="@+id/volume_controls_panel" />-->
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnMute"
-                    android:layout_width="wrap_content"
-                    android:layout_height="80dp"
-                    android:background="@drawable/bg_rounded_card"
-                    android:insetLeft="0dp"
-                    android:insetTop="0dp"
-                    android:insetRight="0dp"
-                    android:insetBottom="0dp"
-                    android:minWidth="0dp"
-                    android:minHeight="0dp"
-                    android:text="@string/mute"
-                    android:textColor="#FFFFFF"
-                    android:textSize="15sp"
-                    app:backgroundTint="@null"
-                    app:icon="@drawable/ic_volume_mute"
-                    app:iconGravity="textStart"
-                    app:iconPadding="0dp"
-                    app:iconSize="48dp"
-                    app:iconTint="@null"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+<!--                <com.google.android.material.button.MaterialButton-->
+<!--                    android:id="@+id/btnMute"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="80dp"-->
+<!--                    android:background="@drawable/bg_rounded_card"-->
+<!--                    android:insetLeft="0dp"-->
+<!--                    android:insetTop="0dp"-->
+<!--                    android:insetRight="0dp"-->
+<!--                    android:insetBottom="0dp"-->
+<!--                    android:minWidth="0dp"-->
+<!--                    android:minHeight="0dp"-->
+<!--                    android:text="@string/mute"-->
+<!--                    android:textColor="#FFFFFF"-->
+<!--                    android:textSize="15sp"-->
+<!--                    app:backgroundTint="@null"-->
+<!--                    app:icon="@drawable/ic_volume_mute"-->
+<!--                    app:iconGravity="textStart"-->
+<!--                    app:iconPadding="0dp"-->
+<!--                    app:iconSize="48dp"-->
+<!--                    app:iconTint="@null"-->
+<!--                    app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintTop_toTopOf="parent"-->
+<!--                    app:layout_constraintVertical_bias="0.0" />-->
+<!--            </androidx.constraintlayout.widget.ConstraintLayout>-->
 
             <!-- Turn Display Off Button -->
             <com.google.android.material.button.MaterialButton
@@ -281,117 +236,211 @@
                 />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-        <!--        <androidx.constraintlayout.widget.ConstraintLayout-->
-        <!--            android:id="@+id/btnPowerDisplay"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="0dp"-->
-        <!--            android:layout_marginTop="16dp"-->
-        <!--            android:background="@drawable/bg_rounded_card_red"-->
-        <!--            android:clickable="true"-->
-        <!--            android:focusable="true"-->
-        <!--            app:layout_constraintEnd_toEndOf="parent"-->
-        <!--            app:layout_constraintStart_toStartOf="parent"-->
-        <!--            app:layout_constraintTop_toBottomOf="@+id/volume_controls_panel"-->
-        <!--            app:layout_constraintBottom_toBottomOf="parent">-->
-
-        <!--            <ImageView-->
-        <!--                android:id="@+id/imgPowerIcon"-->
-        <!--                android:layout_width="22dp"-->
-        <!--                android:layout_height="22dp"-->
-        <!--                android:src="@drawable/pwr_off"-->
-        <!--                android:contentDescription="Turn Display Off power button"-->
-        <!--                app:layout_constraintBottom_toBottomOf="parent"-->
-        <!--                app:layout_constraintEnd_toStartOf="@+id/txtTurnDisplayOff"-->
-        <!--                app:layout_constraintHorizontal_chainStyle="packed"-->
-        <!--                app:layout_constraintStart_toStartOf="parent"-->
-        <!--                app:layout_constraintTop_toTopOf="parent" />-->
-
-        <!--            <TextView-->
-        <!--                android:id="@+id/txtTurnDisplayOff"-->
-        <!--                android:layout_width="wrap_content"-->
-        <!--                android:layout_height="wrap_content"-->
-        <!--                android:layout_marginStart="8dp"-->
-        <!--                android:text="Turn display off"-->
-        <!--                android:textColor="#FFFFFF"-->
-        <!--                android:textSize="15sp"-->
-        <!--                android:textStyle="bold"-->
-        <!--                app:layout_constraintBottom_toBottomOf="parent"-->
-        <!--                app:layout_constraintEnd_toEndOf="parent"-->
-        <!--                app:layout_constraintStart_toEndOf="@+id/imgPowerOffIcon"-->
-        <!--                app:layout_constraintTop_toTopOf="parent" />-->
-        <!--        </androidx.constraintlayout.widget.ConstraintLayout>-->
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Footer bar status row -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/footer"
         android:layout_width="0dp"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <!-- System Online Indicator -->
-<!--        <ImageView-->
-<!--            android:id="@+id/imgSystemOnlineLed"-->
-<!--            android:layout_width="24dp"-->
-<!--            android:layout_height="24dp"-->
-<!--            android:src="@drawable/ic_led"-->
-<!--            android:contentDescription="System online LED indicator"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toTopOf="parent" />-->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/volume_controls_panel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="50dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/bottom_navigation">
 
-<!--        <TextView-->
-<!--            android:id="@+id/txtSystemOnline"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="8dp"-->
-<!--            android:text="System online"-->
-<!--            android:textColor="#A0A0A0"-->
-<!--            android:textSize="16sp"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintStart_toEndOf="@+id/imgSystemOnlineLed"-->
-<!--            app:layout_constraintTop_toTopOf="parent" />-->
+            <ImageView
+                android:id="@+id/imgVolDown"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:clickable="true"
+                android:contentDescription="Volume Down icon"
+                android:src="@drawable/ic_volume_down"
+                app:layout_constraintBottom_toBottomOf="@id/volume_controls_panel"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/volume_controls_panel" />
 
-<!--        <View-->
-<!--            android:id="@+id/viewFooterDivider"-->
-<!--            android:layout_width="1dp"-->
-<!--            android:layout_height="16dp"-->
-<!--            android:layout_marginStart="16dp"-->
-<!--            android:background="#20FFFFFF"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintStart_toEndOf="@+id/txtSystemOnline"-->
-<!--            app:layout_constraintTop_toTopOf="parent" />-->
+            <SeekBar
+                android:id="@+id/seekBarVolume"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:max="100"
+                android:progress="50"
+                android:progressDrawable="@drawable/seekbar_progress"
+                android:thumb="@drawable/seekbar_thumb"
+                app:layout_constraintBottom_toBottomOf="@id/volume_controls_panel"
+                app:layout_constraintEnd_toStartOf="@+id/imgVolUp"
+                app:layout_constraintStart_toEndOf="@+id/imgVolDown"
+                app:layout_constraintTop_toTopOf="@id/volume_controls_panel" />
 
-<!--        &lt;!&ndash; Display Connected Indicator &ndash;&gt;-->
-<!--        <ImageView-->
-<!--            android:id="@+id/imgDisplayConnectedLed"-->
-<!--            android:layout_width="24dp"-->
-<!--            android:layout_height="24dp"-->
-<!--            android:layout_marginStart="16dp"-->
-<!--            android:src="@drawable/ic_led"-->
-<!--            android:contentDescription="Display connected LED indicator"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintStart_toEndOf="@+id/viewFooterDivider"-->
-<!--            app:layout_constraintTop_toTopOf="parent" />-->
+            <ImageView
+                android:id="@+id/imgVolUp"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_marginEnd="20dp"
+                android:clickable="true"
+                android:contentDescription="@string/volume_up_icon"
+                android:src="@drawable/ic_volume_up"
+                app:layout_constraintBottom_toBottomOf="@id/volume_controls_panel"
+                app:layout_constraintEnd_toStartOf="@+id/btnMute"
+                app:layout_constraintTop_toTopOf="@+id/volume_controls_panel" />
 
-<!--        <TextView-->
-<!--            android:id="@+id/txtDisplayConnected"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="8dp"-->
-<!--            android:text="Display connected"-->
-<!--            android:textColor="#A0A0A0"-->
-<!--            android:textSize="16sp"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintStart_toEndOf="@+id/imgDisplayConnectedLed"-->
-<!--            app:layout_constraintTop_toTopOf="parent" />-->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnMute"
+                android:layout_width="wrap_content"
+                android:layout_height="80dp"
+                android:background="@drawable/bg_rounded_card"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:text="@string/mute"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                app:backgroundTint="@null"
+                app:icon="@drawable/ic_volume_mute"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="48dp"
+                app:iconTint="@null"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:id="@+id/bottom_navigation"
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toEndOf="@+id/volume_controls_panel"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/btn_video"
+                android:layout_width="130dp"
+                android:layout_height="100dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/bg_rounded_card_selector"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintEnd_toStartOf="@+id/btn_control"
+                app:layout_constraintTop_toTopOf="@+id/btn_control">
+
+                <ImageView
+                    android:id="@+id/imgVideo"
+                    android:layout_width="50dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="1dp"
+                    android:src="@drawable/ic_display"
+                    app:layout_constraintBottom_toTopOf="@+id/txtVideo"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/txtVideo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:text="@string/video"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/imgVideo" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/btn_control"
+                android:layout_width="130dp"
+                android:layout_height="100dp"
+                android:background="@drawable/bg_rounded_card_selector"
+                android:clickable="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/panelCAGOPS"
+                app:layout_constraintTop_toBottomOf="@+id/panelOutput">
+
+                <ImageView
+                    android:id="@+id/imgControl"
+                    android:layout_width="50dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="1dp"
+                    android:src="@drawable/ic_control"
+                    app:layout_constraintBottom_toTopOf="@+id/txtControl"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/txtControl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:text="@string/control"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/imgControl" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/btn_home"
+                android:layout_width="130dp"
+                android:layout_height="100dp"
+                android:layout_marginStart="16dp"
+                android:background="@drawable/bg_rounded_card_selector"
+                android:clickable="true">
+
+                <ImageView
+                    android:id="@+id/imgHome"
+                    android:layout_width="50dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="1dp"
+                    android:src="@drawable/ic_home"
+                    app:layout_constraintBottom_toTopOf="@+id/txtHome"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/txtHome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:text="@string/home"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/imgHome" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Warmup Overlay -->

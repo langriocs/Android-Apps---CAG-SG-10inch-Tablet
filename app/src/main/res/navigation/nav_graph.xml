@@ -45,7 +45,7 @@
     </fragment>
     <fragment
         android:id="@+id/controlScreen2"
-        android:name="com.avl.cag10inchApp.fragments.ControlScreen2"
+        android:name="com.avl.cag10inchApp.fragments.TrainingPanel"
         android:label="fragment_control_screen2"
         tools:layout="@layout/fragment_control_screen2" >
         <action

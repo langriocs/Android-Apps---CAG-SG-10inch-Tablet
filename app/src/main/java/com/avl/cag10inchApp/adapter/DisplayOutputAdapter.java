@@ -51,6 +51,7 @@ public class DisplayOutputAdapter extends RecyclerView.Adapter<ItemViewHolder> {
         holder.txtDeviceType.setText(item.getDisplayName());
         holder.imgItem.setImageResource(item.getImgResId());
         holder.txtItem.setText(item.getDescription());
+        holder.txtSource.setText(item.getSelectedSourceName());
         holder.getView().setSelected(item.getDeviceId() == selectedDeviceId);
 
         DeviceConnectionState state = item.getConnectionState();

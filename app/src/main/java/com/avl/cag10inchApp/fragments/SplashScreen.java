@@ -76,6 +76,9 @@ public class SplashScreen extends Fragment {
     }
 
     private void proceedToNextScreen(View v) {
+        if (controlDeviceUI == AppConstant.UI_0) {
+            return;
+        }
 
         if (controlDeviceUI == AppConstant.UI_1) {
             Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_briefingPanel);
@@ -89,6 +92,7 @@ public class SplashScreen extends Fragment {
         if (controlDeviceUI == AppConstant.UI_4) {
             Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_masterPanel);
         }
+
     }
 
     private void showAlert(String message ) {
