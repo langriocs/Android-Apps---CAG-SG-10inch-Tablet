@@ -31,6 +31,15 @@ public class DisplayOutputItem {
         this.imgResId = imgResId;
     }
 
+    public DisplayOutputItem(RoomDevice roomDevice) {
+        this.deviceId = roomDevice.getId();
+        this.displayName = roomDevice.getDeviceName();
+        this.description = roomDevice.getDeviceDesc();
+        this.deviceIp = roomDevice.getDeviceIpAddress();
+        this.devicePort = roomDevice.getDevicePort();
+        this.outportNumber = roomDevice.getOutPort();
+    }
+
     public int getDeviceId() {
         return deviceId;
     }

@@ -1,16 +1,33 @@
 package com.avl.cag10inchApp.viewmodel;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.avl.cag10inchApp.model.DisplayOutputItem;
+import com.avl.cag10inchApp.model.DisplaySourceItem;
 import com.avl.cag10inchApp.repository.IRoomDevice;
+import com.avl.cag10inchApp.repository.audio.DSPChannel;
+import com.avl.cag10inchApp.repository.audio.DSPRepository;
+import com.avl.cag10inchApp.repository.audio.IDSPRepository;
+import com.avl.cag10inchApp.repository.ledwall.ILEDWallListener;
+import com.avl.cag10inchApp.repository.ledwall.ILEDWallRepository;
+import com.avl.cag10inchApp.repository.ledwall.LEDWallRepository;
+import com.avl.cag10inchApp.repository.switcher.ISwitchRepository;
+import com.avl.cag10inchApp.repository.switcher.Switch32x32Repository;
 import com.avl.cag10inchApp.repository.switcher.Switch5x1Output;
+import com.avl.cag10inchApp.repository.tv.ITVRepository;
 import com.avl.cag10inchApp.repository.tv.TVPowerState;
 import com.avl.cag10inchApp.repository.switcher.ISwitchListener;
 import com.avl.cag10inchApp.repository.switcher.Switch5x1Repository;
 import com.avl.cag10inchApp.repository.tv.ITVListener;
 import com.avl.cag10inchApp.repository.tv.LGTVRepository;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class TrainingPanelViewModel extends ViewModel {
 
@@ -23,16 +40,18 @@ public class TrainingPanelViewModel extends ViewModel {
     private final MutableLiveData<Boolean> tvMuted = new MutableLiveData<>(false);
     private final MutableLiveData<String> tvMessage = new MutableLiveData<>("");
     private final MutableLiveData<Integer> tvVolume = new MutableLiveData<>(50);
+    private final MutableLiveData<Boolean> isMuted = new MutableLiveData<>(false);
+    private final MutableLiveData<Integer> dspVolume = new MutableLiveData<>(50);
 
-
-    private final IRoomDevice tvRepository;
-    private final IRoomDevice switchRepository;
+    private final MutableLiveData<List<DisplayOutputItem>> displayOutputItems = new MutableLiveData<>(new ArrayList<>());
+    private DisplaySourceItem selectedSource;
 
     public TrainingPanelViewModel() {
-        tvRepository = new LGTVRepository();
-        switchRepository = new Switch5x1Repository();
-        setupTVListener();
-        setupSwitchListener();
+
+    }
+
+    public LiveData<List<DisplayOutputItem>> getDisplayOutputItems() {
+        return displayOutputItems;
     }
 
     public LiveData<Boolean> getIsSystemInitialized() { return isSystemInitialized; }
@@ -78,92 +97,160 @@ public class TrainingPanelViewModel extends ViewModel {
         return tvVolume;
     }
 
-    // TV setup
-    private void setupTVListener() {
-        ((LGTVRepository) tvRepository).setListener(new ITVListener() {
-            @Override
-            public void onConnected() {
-                isTVConnected.postValue(true);
+    public void connectAllDevices(List<DisplayOutputItem> displayOutputItems) {
+
+        for (DisplayOutputItem item : displayOutputItems) {
+            if (item.getDisplayName().equals("Switch")) {
+                item.setRoomDevice(connectSwitch(item.getDeviceIp(), item.getDevicePort()));
+            } else if (item.getDisplayName().equals("TV")) {
+                item.setRoomDevice(connectTV(item));
+            } else if (item.getDisplayName().equals("LED_WALL")) {
+                item.setRoomDevice(connectLEDWall(item.getDeviceIp(), item.getDevicePort()));
+            } else if (item.getDisplayName().equals("DSP")) {
+                item.setRoomDevice(connectDSP(item.getDeviceIp(), item.getDevicePort()));
             }
+        }
 
-            @Override
-            public void onDisconnected() {
-                isTVConnected.postValue(false);
-            }
-
-            @Override
-            public void onPowerStateChanged(TVPowerState state) {
-                tvState.postValue(state);
-            }
-
-            @Override
-            public void onVolumeChanged(int volume) {
-                tvVolume.postValue(volume);
-            }
-
-            @Override
-            public void onMuteChanged(boolean state) {
-                tvMuted.postValue(state);
-            }
-
-            @Override
-            public void onError(String message) {
-
-            }
-        });
+        this.displayOutputItems.postValue(displayOutputItems);
     }
+    private IRoomDevice connectSwitch(String ip, int port) {
+        IRoomDevice switchRepository = new Switch32x32Repository();
+        ((ISwitchRepository) switchRepository).setListener(new ISwitchListener() {
 
-    public void connectTV(String ip, int port) {
-        tvRepository.connect(ip, port);
-    }
-
-    public void turnOnTV() {
-        ((LGTVRepository) tvRepository).turnOn();
-    }
-
-    public void turnOffTV() {
-        ((LGTVRepository) tvRepository).turnOff();
-    }
-
-    public void changeMute(boolean isMute) {
-        ((LGTVRepository) tvRepository).setMute(isMute);
-    }
-
-    public void changeVolume(int volume) {
-        ((LGTVRepository) tvRepository).setVolume(volume);
-    }
-
-    // Switch setup
-    private void setupSwitchListener() {
-        ((Switch5x1Repository) switchRepository).setListener(new ISwitchListener() {
             @Override
             public void onConnected() {
                 isSwitcherConnected.postValue(true);
+                Log.d("cag", "Switcher connected " + ip);
             }
 
             @Override
             public void onDisconnected() {
                 isSwitcherConnected.postValue(false);
+                Log.d("cag", "Switcher disconnected " + ip);
             }
         });
+
+        switchRepository.connect(ip, port);
+
+        return switchRepository;
     }
 
-    public void connectSwitcher(String ip, int port) {
-        switchRepository.connect(ip, port);
+    private IRoomDevice connectTV(DisplayOutputItem item) {
+        IRoomDevice tvRepository = new LGTVRepository();
+        ((ITVRepository) tvRepository).setListener(new ITVListener() {
+
+            @Override
+            public void onConnected() {
+
+                Log.d("cag", "TV connected " + item.getDeviceIp());
+            }
+
+            @Override
+            public void onDisconnected() {
+
+            }
+
+            @Override
+            public void onPowerStateChanged(TVPowerState state) {
+//                boolean isOn = state == TVPowerState.ON;
+//                updateDisplayPowerState(roomDevice.getId(), isOn);
+            }
+
+            @Override
+            public void onVolumeChanged(int volume) {
+            }
+
+            @Override
+            public void onMuteChanged(boolean isMuted) {
+//                this.isMuted.postValue(isMuted);
+            }
+
+            @Override
+            public void onError(String message) {
+            }
+        });
+
+
+        tvRepository.connect(item.getDeviceIp(), item.getDevicePort());
+
+        return tvRepository;
+
     }
-    public void disconnectSwitcher() {
-        switchRepository.disconnect();
+
+    private IRoomDevice connectLEDWall(String ip, int port) {
+        IRoomDevice ledWallRepository = new LEDWallRepository();
+        ((ILEDWallRepository) ledWallRepository).setListener(new ILEDWallListener() {
+
+            @Override
+            public void onConnected() {
+
+            }
+
+            @Override
+            public void onDisconnected() {
+
+            }
+        });
+
+        ledWallRepository.connect(ip, port);
+
+        return ledWallRepository;
     }
+
+    private IRoomDevice connectDSP(String ip, int port) {
+        IRoomDevice ledAudioRepository = new DSPRepository();
+        ((IDSPRepository) ledAudioRepository).setListener(new ILEDWallListener() {
+
+            @Override
+            public void onConnected() {
+                ((IDSPRepository) ledAudioRepository).setChannel(DSPChannel.CH_1);
+                ((IDSPRepository) ledAudioRepository).setVolume(411);
+                ((IDSPRepository) ledAudioRepository).setMute(0);
+                dspVolume.postValue(411);
+            }
+
+            @Override
+            public void onDisconnected() {
+            }
+        });
+
+        ledAudioRepository.connect(ip, port);
+        ((IDSPRepository) ledAudioRepository).setChannel(DSPChannel.CH_1);
+        ((IDSPRepository) ledAudioRepository).setVolume(411);
+        ((IDSPRepository) ledAudioRepository).setMute(0);
+
+        dspVolume.postValue(411);
+
+        return ledAudioRepository;
+    }
+
+    public void turnOnTV() {
+
+    }
+
+    public void turnOffTV() {
+
+    }
+
+    public void changeMute(boolean isMute) {
+
+    }
+
+    public void changeVolume(int volume) {
+
+    }
+
+
     public void routeInputSourceToUSB() {
         isUsbCSelected.postValue(true);
         isWirelessSelected.postValue(false);
-        ((Switch5x1Repository) switchRepository).routeInputSourceTo(Switch5x1Output.USB_1);
+
     }
 
     public void routeInputSourceToWireless() {
         isUsbCSelected.postValue(false);
         isWirelessSelected.postValue(true);
-        ((Switch5x1Repository) switchRepository).routeInputSourceTo(Switch5x1Output.HDMI_4);
+
     }
 
 
@@ -171,8 +258,44 @@ public class TrainingPanelViewModel extends ViewModel {
     protected void onCleared() {
         super.onCleared();
 
-        tvRepository.cleanup();
-        switchRepository.cleanup();
     }
 
+    public void setSelectedSource(DisplaySourceItem source) {
+        selectedSource = source;
+    }
+
+    public void routeHDMIDirectToLEDWall() {
+        List<DisplayOutputItem> items = displayOutputItems.getValue();
+
+        if (items == null) {
+            return;
+        }
+
+        // get the repository for the LED wall
+        for (DisplayOutputItem item : items) {
+            if (item.getRoomDevice() instanceof LEDWallRepository) {
+                // set the preset
+                ((LEDWallRepository) item.getRoomDevice()).setPresetDirect();
+                break;
+            }
+        }
+
+        // get the repository for the switch
+        for (DisplayOutputItem item : items) {
+            if (item.getRoomDevice() instanceof Switch32x32Repository) {
+                // route the video
+                ((Switch32x32Repository) item.getRoomDevice()).routeAV(selectedSource.getPortNumber(), item.getOutportNumber());
+                break;
+            }
+        }
+
+        // get the repository for the switch
+        for (DisplayOutputItem item : items) {
+            if (item.getRoomDevice() instanceof Switch32x32Repository) {
+                // route the audio
+                ((Switch32x32Repository) item.getRoomDevice()).routeAV(selectedSource.getPortNumber(), item.getOutportNumber());
+                break;
+            }
+        }
+    }
 }

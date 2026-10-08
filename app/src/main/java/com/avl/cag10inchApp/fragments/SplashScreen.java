@@ -71,7 +71,8 @@ public class SplashScreen extends Fragment {
 //        final String ipAddress = "192.168.1.110"; // CAG OPS
 //        final String ipAddress = "192.168.1.131"; // Master
 //        final String ipAddress = "192.168.1.130"; // Briefing
-        final String ipAddress = MyLibUtil.getIPAddress(true);
+        final String ipAddress = "192.168.1.100"; // Training
+//        final String ipAddress = MyLibUtil.getIPAddress(true);
         shareViewModel.fetchControlDeviceByIpAddress(ipAddress);
     }
 
@@ -87,7 +88,7 @@ public class SplashScreen extends Fragment {
             Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_cagopsPanel);
         }
         if (controlDeviceUI == AppConstant.UI_3) {
-            Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_controlScreen3);
+            Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_trainingPanel);
         }
         if (controlDeviceUI == AppConstant.UI_4) {
             Navigation.findNavController(v).navigate(R.id.action_splashScreen1_to_masterPanel);

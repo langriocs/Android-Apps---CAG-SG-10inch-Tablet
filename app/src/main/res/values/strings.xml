@@ -47,4 +47,6 @@
     <string name="tv_power">TV Power</string>
     <string name="home">HOME</string>
     <string name="select_output">Select output</string>
+    <string name="hdmi_direct">HDMI Direct</string>
+    <string name="microsoft_team">Microsoft Team</string>
 </resources>

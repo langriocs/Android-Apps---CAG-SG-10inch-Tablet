@@ -62,6 +62,12 @@ public class LEDWallRepository implements ILEDWallRepository, IRoomDevice {
     }
 
     @Override
+    public void setPresetDirect() {
+        tcpClient.sendHex("U AA 00 00 FE 00 00 00 00 00 01 00 00 01Q 13 01 00 00 BAV\r");
+        tcpClient.sendMessage("U AA 00 00 FE 00 00 00 00 00 01 00 00 01Q 13 01 00 00 BAV\r");
+    }
+
+    @Override
     public void getStatus() {
 
     }

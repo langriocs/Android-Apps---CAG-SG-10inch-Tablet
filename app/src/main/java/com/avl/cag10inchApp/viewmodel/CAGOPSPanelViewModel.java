@@ -62,8 +62,6 @@ public class CAGOPSPanelViewModel extends ViewModel {
 
     }
 
-    // --- Dynamic Room Devices Connection Management ---
-
     public void connectAllDevices(List<DisplayOutputItem> displayOutputItems) {
 
         for (DisplayOutputItem item : displayOutputItems) {
