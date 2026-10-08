@@ -47,8 +47,6 @@ public class TrainingPanel extends Fragment {
     private List<DisplayOutputItem> displayOutputItems;
     private int volNum = 50;
 
-
-
     public static TrainingPanel newInstance() {
         return new TrainingPanel();
     }
