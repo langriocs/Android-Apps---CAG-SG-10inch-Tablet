@@ -17,16 +17,13 @@ import com.avl.cag10inchApp.repository.ledwall.ILEDWallRepository;
 import com.avl.cag10inchApp.repository.ledwall.LEDWallRepository;
 import com.avl.cag10inchApp.repository.switcher.ISwitchRepository;
 import com.avl.cag10inchApp.repository.switcher.Switch32x32Repository;
-import com.avl.cag10inchApp.repository.switcher.Switch5x1Output;
 import com.avl.cag10inchApp.repository.tv.ITVRepository;
 import com.avl.cag10inchApp.repository.tv.TVPowerState;
 import com.avl.cag10inchApp.repository.switcher.ISwitchListener;
-import com.avl.cag10inchApp.repository.switcher.Switch5x1Repository;
 import com.avl.cag10inchApp.repository.tv.ITVListener;
 import com.avl.cag10inchApp.repository.tv.LGTVRepository;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class TrainingPanelViewModel extends ViewModel {
@@ -40,7 +37,7 @@ public class TrainingPanelViewModel extends ViewModel {
     private final MutableLiveData<Boolean> tvMuted = new MutableLiveData<>(false);
     private final MutableLiveData<String> tvMessage = new MutableLiveData<>("");
     private final MutableLiveData<Integer> tvVolume = new MutableLiveData<>(50);
-    private final MutableLiveData<Boolean> isMuted = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> dspMuted = new MutableLiveData<>(false);
     private final MutableLiveData<Integer> dspVolume = new MutableLiveData<>(50);
 
     private final MutableLiveData<List<DisplayOutputItem>> displayOutputItems = new MutableLiveData<>(new ArrayList<>());
@@ -96,6 +93,8 @@ public class TrainingPanelViewModel extends ViewModel {
     public LiveData<Integer> getTVVolume() {
         return tvVolume;
     }
+
+    public LiveData<Boolean> getDSPMuted() { return dspMuted; }
 
     public void connectAllDevices(List<DisplayOutputItem> displayOutputItems) {
 
@@ -233,21 +232,110 @@ public class TrainingPanelViewModel extends ViewModel {
     }
 
     public void changeMute(boolean isMute) {
+        List<DisplayOutputItem> items = displayOutputItems.getValue();
+        if (items == null) {
+            return;
+        }
 
+        for(DisplayOutputItem item : items) {
+            if (item.getRoomDevice() instanceof DSPRepository) {
+                ((IDSPRepository) item.getRoomDevice()).setMute(isMute ? 1 : 0);
+                break;
+            }
+        }
+
+        this.dspMuted.postValue(isMute);
     }
 
     public void changeVolume(int volume) {
+        List<DisplayOutputItem> items = this.displayOutputItems.getValue();
 
+        if (items == null) {
+            return;
+        }
+
+        for (DisplayOutputItem item: items ) {
+
+            if (item.getRoomDevice() instanceof  DSPRepository) {
+                ((IDSPRepository) item.getRoomDevice()).setVolume(volume);
+            }
+        }
+        this.dspVolume.postValue(volume);
     }
 
 
-    public void routeInputSourceToUSB() {
-        isUsbCSelected.postValue(true);
-        isWirelessSelected.postValue(false);
+    public void routeInputSourceUSB() {
+        List<DisplayOutputItem> items = displayOutputItems.getValue();
+
+        if (items == null) {
+            return;
+        }
+
+        // get the repository for the LED wall
+        for (DisplayOutputItem item : items) {
+            if (item.getRoomDevice() instanceof LEDWallRepository) {
+                // set the preset
+                ((LEDWallRepository) item.getRoomDevice()).setPresetDirect();
+                break;
+            }
+        }
+
+        // get the repository for the switch
+        for (DisplayOutputItem item : items) {
+            if (item.getRoomDevice() instanceof Switch32x32Repository) {
+                // route the video
+                ((Switch32x32Repository) item.getRoomDevice()).routeAV(selectedSource.getPortNumber(), 1);
+                break;
+            }
+        }
+
+        // get the repository for the switch
+        for (DisplayOutputItem item : items) {
+            if (item.getRoomDevice() instanceof Switch32x32Repository) {
+                // route the audio
+                ((Switch32x32Repository) item.getRoomDevice()).routeAV(selectedSource.getPortNumber(), 8);
+                break;
+            }
+        }
+//        isUsbCSelected.postValue(true);
+//        isWirelessSelected.postValue(false);
 
     }
 
-    public void routeInputSourceToWireless() {
+    public void routeInputSourceWireless() {
+        List<DisplayOutputItem> items = displayOutputItems.getValue();
+
+        if (items == null) {
+            return;
+        }
+
+        // get the repository for the LED wall
+        for (DisplayOutputItem item : items) {
+            if (item.getRoomDevice() instanceof LEDWallRepository) {
+                // set the preset
+                ((LEDWallRepository) item.getRoomDevice()).setPresetDirect();
+                break;
+            }
+        }
+
+        // get the repository for the switch
+        for (DisplayOutputItem item : items) {
+            if (item.getRoomDevice() instanceof Switch32x32Repository) {
+                // route the video
+                ((Switch32x32Repository) item.getRoomDevice()).routeAV(selectedSource.getPortNumber(), 1);
+                break;
+            }
+        }
+
+        // get the repository for the switch
+        for (DisplayOutputItem item : items) {
+            if (item.getRoomDevice() instanceof Switch32x32Repository) {
+                // route the audio
+                ((Switch32x32Repository) item.getRoomDevice()).routeAV(selectedSource.getPortNumber(), 8);
+                break;
+            }
+        }
+
         isUsbCSelected.postValue(false);
         isWirelessSelected.postValue(true);
 
@@ -284,7 +372,7 @@ public class TrainingPanelViewModel extends ViewModel {
         for (DisplayOutputItem item : items) {
             if (item.getRoomDevice() instanceof Switch32x32Repository) {
                 // route the video
-                ((Switch32x32Repository) item.getRoomDevice()).routeAV(selectedSource.getPortNumber(), item.getOutportNumber());
+                ((Switch32x32Repository) item.getRoomDevice()).routeAV(selectedSource.getPortNumber(), 1);
                 break;
             }
         }
@@ -293,7 +381,7 @@ public class TrainingPanelViewModel extends ViewModel {
         for (DisplayOutputItem item : items) {
             if (item.getRoomDevice() instanceof Switch32x32Repository) {
                 // route the audio
-                ((Switch32x32Repository) item.getRoomDevice()).routeAV(selectedSource.getPortNumber(), item.getOutportNumber());
+                ((Switch32x32Repository) item.getRoomDevice()).routeAV(selectedSource.getPortNumber(), 8);
                 break;
             }
         }

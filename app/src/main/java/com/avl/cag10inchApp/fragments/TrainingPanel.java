@@ -11,6 +11,7 @@ import androidx.navigation.Navigation;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.avl.cag10inchApp.R;
@@ -22,6 +23,7 @@ import com.avl.cag10inchApp.viewmodel.BriefingPanelViewModel;
 import com.avl.cag10inchApp.viewmodel.ControlScreen2ViewModel;
 import com.avl.cag10inchApp.viewmodel.ShareViewModel;
 import com.avl.cag10inchApp.viewmodel.TrainingPanelViewModel;
+import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +40,13 @@ public class TrainingPanel extends Fragment {
     private View btnSourceUsbC;
     private View btnSourceWireless;
     private View btnMicrosoft;
+    private MaterialButton btnMute;
+    private View btnVolDown;
+    private View btnVolUp;
+    private SeekBar seekBarVolume;
     private List<DisplayOutputItem> displayOutputItems;
+    private int volNum = 50;
+
 
 
     public static TrainingPanel newInstance() {
@@ -99,10 +107,18 @@ public class TrainingPanel extends Fragment {
             selectedSource = sourceWireless;
             setSelectedSource(false, true, false);
 
+            // route
+            mViewModel.setSelectedSource(selectedSource);
+            mViewModel.routeInputSourceUSB();
+
         });
         btnMicrosoft.setOnClickListener(view -> {
             selectedSource = sourceMicrosoft;
             setSelectedSource(false, false, true);
+
+            // route
+            mViewModel.setSelectedSource(selectedSource);
+            mViewModel.routeInputSourceWireless();
         });
     }
 
@@ -116,12 +132,62 @@ public class TrainingPanel extends Fragment {
     }
 
     private void setupAudioControl(View v) {
-        View btnMute = v.findViewById(R.id.btnMute);
-        View btnVolDown = v.findViewById(R.id.imgVolDown);
-        View btnVolUp = v.findViewById(R.id.imgVolUp);
+        btnMute = v.findViewById(R.id.btnMute);
+        btnVolDown = v.findViewById(R.id.imgVolDown);
+        btnVolUp = v.findViewById(R.id.imgVolUp);
+        seekBarVolume = v.findViewById(R.id.seekBarVolume);
+
+        btnMute.setOnClickListener(view -> {
+            Boolean current = mViewModel.getDSPMuted().getValue();
+            mViewModel.changeMute(current == null || !current);
+        });
+
+        btnVolDown.setOnClickListener(view -> {
+
+            if (volNum > 0) {
+                volNum = seekBarVolume.getProgress();
+                volNum--;
+                seekBarVolume.setProgress(volNum);
+                mViewModel.changeVolume(volNum);
+            }
+
+        });
+
+        btnVolUp.setOnClickListener(view -> {
+            if (volNum < 100) {
+                volNum = seekBarVolume.getProgress();
+                volNum++;
+                seekBarVolume.setProgress(volNum);
+                mViewModel.changeVolume(volNum);
+            }
+        });
+
+        seekBarVolume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                volNum = seekBar.getProgress();
+
+                mViewModel.changeVolume(volNum);
+            }
+        });
     }
     private void observerViewModel() {
+        mViewModel.getDSPMuted().observe(getViewLifecycleOwner(), isMuted -> {
 
+//            btnMute.setSelected(isMuted);
+            btnMute.setBackgroundResource(isMuted ? R.drawable.bg_rounded_card_selected : R.drawable.bg_rounded_card);
+            btnMute.setIconResource(isMuted ? R.drawable.ic_volume_down : R.drawable.ic_volume_mute );
+        });
     }
 
     private void fetchControlDevicesData() {
