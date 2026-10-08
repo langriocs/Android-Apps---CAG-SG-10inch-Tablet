@@ -12,6 +12,7 @@ import com.avl.cag10inchApp.model.vo.RoomDevice;
 import com.avl.cag10inchApp.repository.DeviceConnectionState;
 import com.avl.cag10inchApp.repository.IRoomDevice;
 import com.avl.cag10inchApp.repository.audio.DSPRepository;
+import com.avl.cag10inchApp.repository.audio.IAudioListener;
 import com.avl.cag10inchApp.repository.audio.IDSPRepository;
 import com.avl.cag10inchApp.repository.ledwall.ILEDWallListener;
 import com.avl.cag10inchApp.repository.ledwall.ILEDWallRepository;
@@ -194,7 +195,7 @@ public class MasterPanelViewModel extends ViewModel {
 
     private IRoomDevice connectDSP(int id, String ip, int port) {
         IRoomDevice ledAudioRepository = new DSPRepository();
-        ((IDSPRepository) ledAudioRepository).setListener(new ILEDWallListener() {
+        ((IDSPRepository) ledAudioRepository).setListener(new IAudioListener() {
 
             @Override
             public void onConnected() {
@@ -204,6 +205,26 @@ public class MasterPanelViewModel extends ViewModel {
             @Override
             public void onDisconnected() {
                 updateConnectionState( id, DeviceConnectionState.DISCONNECTED);
+            }
+
+            @Override
+            public void onVolumeChanged(int volume) {
+
+            }
+
+            @Override
+            public void onMuteChanged(boolean isMuted) {
+
+            }
+
+            @Override
+            public void setListener(IAudioListener listener) {
+
+            }
+
+            @Override
+            public void onError(String message) {
+
             }
         });
 

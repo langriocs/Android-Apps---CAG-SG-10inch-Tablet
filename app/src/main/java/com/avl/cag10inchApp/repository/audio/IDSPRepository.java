@@ -6,6 +6,6 @@ public interface IDSPRepository {
     void setChannel(DSPChannel channel);
     void setVolume( int faderValue);
     void setMute( int value);
-    void setListener(ILEDWallListener listener);
+    void setListener(IAudioListener listener);
     void cleanup();
 }

@@ -14,6 +14,7 @@ import com.avl.cag10inchApp.repository.DeviceConnectionState;
 import com.avl.cag10inchApp.repository.IRoomDevice;
 import com.avl.cag10inchApp.repository.audio.DSPChannel;
 import com.avl.cag10inchApp.repository.audio.DSPRepository;
+import com.avl.cag10inchApp.repository.audio.IAudioListener;
 import com.avl.cag10inchApp.repository.audio.IDSPRepository;
 import com.avl.cag10inchApp.repository.ledwall.ILEDWallListener;
 import com.avl.cag10inchApp.repository.ledwall.ILEDWallRepository;
@@ -84,8 +85,7 @@ public class CAGOPSPanelViewModel extends ViewModel {
 
     private IRoomDevice connectDSP(int id, String ip, int port) {
         IRoomDevice ledAudioRepository = new DSPRepository();
-        ((IDSPRepository) ledAudioRepository).setListener(new ILEDWallListener() {
-
+        ((IDSPRepository) ledAudioRepository).setListener(new IAudioListener() {
             @Override
             public void onConnected() {
                 updateConnectionState( id, DeviceConnectionState.CONNECTED);
@@ -93,11 +93,32 @@ public class CAGOPSPanelViewModel extends ViewModel {
                 ((IDSPRepository) ledAudioRepository).setVolume(411);
                 ((IDSPRepository) ledAudioRepository).setMute(0);
                 volume.postValue(411);
+
             }
 
             @Override
             public void onDisconnected() {
                 updateConnectionState( id, DeviceConnectionState.DISCONNECTED);
+            }
+
+            @Override
+            public void onVolumeChanged(int volume) {
+
+            }
+
+            @Override
+            public void onMuteChanged(boolean isMuted) {
+
+            }
+
+            @Override
+            public void setListener(IAudioListener listener) {
+
+            }
+
+            @Override
+            public void onError(String message) {
+
             }
         });
 
@@ -232,7 +253,7 @@ public class CAGOPSPanelViewModel extends ViewModel {
 
         for (DisplayOutputItem item : currentItems) {
             if (item.getDisplayName().equals("Switch")) {
-                ((Switch32x32Repository) item.getRoomDevice()).routeAV(selectedSource.getPortNumber(), 24);
+                ((Switch32x32Repository) item.getRoomDevice()).routeAV(selectedSource.getPortNumber(), 26);
                 break;
             }
         }
@@ -248,9 +269,9 @@ public class CAGOPSPanelViewModel extends ViewModel {
             return;
         }
         for (DisplayOutputItem item : items) {
-            if (item.getDisplayName().equals("TV")) {
-                ((LGTVRepository) item.getRoomDevice()).setMute(isMute);
-            }
+//            if (item.getDisplayName().equals("TV")) {
+//                ((LGTVRepository) item.getRoomDevice()).setMute(isMute);
+//            }
 
             if (item.getDisplayName().equals("DSP")) {
 

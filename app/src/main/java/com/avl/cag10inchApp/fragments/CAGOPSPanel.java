@@ -61,7 +61,7 @@ public class CAGOPSPanel extends Fragment {
     private SeekBar seekBarVolume;
     private MaterialButton btnMute;
     private MaterialButton btnPower;
-    private int volNum;
+    private int volNum=50;
     private View layoutVideo;
     private View layoutControl;
     private View btnVideo;
@@ -135,7 +135,9 @@ public class CAGOPSPanel extends Fragment {
 
             List<DisplayOutputItem> items = displayOutputItems
                     .stream()
-                    .filter(displayOutputItem -> !displayOutputItem.getDisplayName().equals("Switch"))
+                    .filter(displayOutputItem -> {
+                        return (!displayOutputItem.getDisplayName().equals("Switch") && !displayOutputItem.getDisplayName().equals("DSP"));
+                    })
                     .collect(Collectors.toList());
 
             displayOutputAdapter.setItems(items);

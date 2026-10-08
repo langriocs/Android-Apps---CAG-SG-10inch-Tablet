@@ -80,18 +80,18 @@ public class DSPRepository implements IDSPRepository, IRoomDevice {
     @Override
     public void setVolume(int volume) {
         int faderValue = 311 + (volume * 2);
-        tcpClient.sendMessage("SICL S 0000 00 NC "+ channel +","+ faderValue +" \r");
+        tcpClient.sendMessage("SICL S 0000 00 NC "+ channel.getValue() +","+ faderValue +" \r");
     }
 
     @Override
     public void setMute(int value) {
 //        tcpClient.sendMessage("SICM S 0000 00 NC "+ channel +","+ value +" \r");
-        tcpClient.sendMessage("SOCM S 0000 00 NC "+channel+","+value+" \r");
+        tcpClient.sendMessage("SOCM S 0000 00 NC "+ channel.getValue() +","+value+" \r");
     }
 
     @Override
-    public void setListener(ILEDWallListener listener) {
-
+    public void setListener(IAudioListener listener) {
+        this.listener = listener;
     }
 
     @Override
@@ -99,11 +99,4 @@ public class DSPRepository implements IDSPRepository, IRoomDevice {
 
     }
 
-    public IAudioListener getListener() {
-        return listener;
-    }
-
-    public void setListener(IAudioListener listener) {
-        this.listener = listener;
-    }
 }
