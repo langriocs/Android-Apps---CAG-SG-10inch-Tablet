@@ -46,7 +46,7 @@
         android:id="@+id/txtSource"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/white"
+        android:textColor="@color/button_border_source_selected_color"
         android:textSize="14sp"
         app:layout_constraintTop_toBottomOf="@+id/txtDisplay"
         app:layout_constraintEnd_toEndOf="parent"

@@ -35,6 +35,8 @@ import com.avl.cag10inchApp.viewmodel.ShareViewModel;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -133,11 +135,33 @@ public class CAGOPSPanel extends Fragment {
 
         mViewModel.getDisplayOutputItems().observe(getViewLifecycleOwner(), displayOutputItems -> {
 
+            List<Integer> order = Arrays.asList(
+                    63,
+                    64,
+                    61,
+                    62
+            );
+
             List<DisplayOutputItem> items = displayOutputItems
                     .stream()
                     .filter(displayOutputItem -> {
                         return (!displayOutputItem.getDisplayName().equals("Switch") && !displayOutputItem.getDisplayName().equals("DSP"));
                     })
+                    .sorted(Comparator.comparingInt(item -> {
+                        switch (item.getDeviceId()) {
+                            case 63:
+                                return 1;
+                            case 64:
+                                return 2;
+                            case 61:
+                                return 3;
+                            case 62:
+                                return 4;
+                            default:
+                                return 0;
+
+                        }
+                    }))
                     .collect(Collectors.toList());
 
             displayOutputAdapter.setItems(items);

@@ -85,7 +85,6 @@ public class DSPRepository implements IDSPRepository, IRoomDevice {
 
     @Override
     public void setMute(int value) {
-//        tcpClient.sendMessage("SICM S 0000 00 NC "+ channel +","+ value +" \r");
         tcpClient.sendMessage("SOCM S 0000 00 NC "+ channel.getValue() +","+value+" \r");
     }
 
