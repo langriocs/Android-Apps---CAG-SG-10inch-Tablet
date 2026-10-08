@@ -386,4 +386,21 @@ public class TrainingPanelViewModel extends ViewModel {
             }
         }
     }
+
+    public void shutdown() {
+        List<DisplayOutputItem> items = displayOutputItems.getValue();
+
+        if (items == null) {
+            return;
+        }
+
+        // get the repository for the LED wall
+        for (DisplayOutputItem item : items) {
+            if (item.getRoomDevice() instanceof LEDWallRepository) {
+                // set the preset
+                ((LEDWallRepository) item.getRoomDevice()).setPreset(4);
+                break;
+            }
+        }
+    }
 }

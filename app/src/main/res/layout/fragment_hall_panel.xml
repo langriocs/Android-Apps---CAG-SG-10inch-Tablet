@@ -65,7 +65,7 @@
                 android:id="@+id/btn_separation_hall"
                 android:layout_width="450dp"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_rounded_card"
+                android:background="@drawable/bg_rounded_card_selector"
                 android:text="SEPARATE HALL OPERATION"
                 android:textColor="@color/white"
                 android:textSize="64sp"

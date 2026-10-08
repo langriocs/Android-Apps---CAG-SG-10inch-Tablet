@@ -73,6 +73,7 @@ public class TrainingPanel extends Fragment {
         View btnHome = view.findViewById(R.id.btn_home);
 
         btnHome.setOnClickListener(v -> {
+            mViewModel.shutdown();
             Navigation.findNavController(v).navigate(R.id.action_trainingPanel_to_splashScreen1);
         });
 

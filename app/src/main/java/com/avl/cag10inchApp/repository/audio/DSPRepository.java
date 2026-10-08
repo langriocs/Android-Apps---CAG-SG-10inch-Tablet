@@ -54,7 +54,7 @@ public class DSPRepository implements IDSPRepository, IRoomDevice {
 
     @Override
     public void connect(String ip, int port) {
-
+        tcpClient.connect(ip, port);
     }
 
     @Override
