@@ -65,13 +65,42 @@
         app:layout_constraintTop_toBottomOf="@+id/header">
 
         <!-- Source Buttons container -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" >
+
+            <ImageView
+                android:id="@+id/imgDSPOnline"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/bg_connect_selector"
+                android:contentDescription="System online LED indicator"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="DSP Status"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                />
+
+        </LinearLayout>
+
+
         <FrameLayout
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"  >
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0">
 
             <include
                 android:id="@+id/layout_cagops_video"
@@ -79,6 +108,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="visible" />
+
             <include
                 android:id="@+id/layout_master_control"
                 layout="@layout/fragment_cagops_panel_control"

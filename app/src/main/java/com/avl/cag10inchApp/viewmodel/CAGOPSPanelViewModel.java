@@ -41,6 +41,7 @@ public class CAGOPSPanelViewModel extends ViewModel {
     private final MutableLiveData<Map<String, Boolean>> deviceConnectionStates = new MutableLiveData<>(new HashMap<>());
     private final MutableLiveData<Boolean> isSystemInitialized = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> isSwitcherConnected = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> isDSPConnected = new MutableLiveData<>(false);
     private final MutableLiveData<List<DisplayOutputItem>> displayOutputItems = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<DisplayOutputItem> selectedDeviceOutput = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isMuted = new MutableLiveData<>(false);
@@ -58,6 +59,7 @@ public class CAGOPSPanelViewModel extends ViewModel {
     public LiveData<DisplayOutputItem> getSelectedDeviceOutput() { return selectedDeviceOutput; }
     public LiveData<Boolean> getIsMuted() { return isMuted; }
     public LiveData<Integer> getVolume() { return volume; }
+    public LiveData<Boolean> getIsDSPConnected() { return isDSPConnected;}
 
     public CAGOPSPanelViewModel() {
 
@@ -88,17 +90,19 @@ public class CAGOPSPanelViewModel extends ViewModel {
         ((IDSPRepository) ledAudioRepository).setListener(new IAudioListener() {
             @Override
             public void onConnected() {
-                updateConnectionState( id, DeviceConnectionState.CONNECTED);
+//                updateConnectionState( id, DeviceConnectionState.CONNECTED);
                 ((IDSPRepository) ledAudioRepository).setChannel(DSPChannel.CH_1);
-                ((IDSPRepository) ledAudioRepository).setVolume(411);
+                ((IDSPRepository) ledAudioRepository).setVolume(50);
                 ((IDSPRepository) ledAudioRepository).setMute(0);
-                volume.postValue(411);
+                volume.postValue(50);
+                isDSPConnected.postValue(true);
 
             }
 
             @Override
             public void onDisconnected() {
-                updateConnectionState( id, DeviceConnectionState.DISCONNECTED);
+//                updateConnectionState( id, DeviceConnectionState.DISCONNECTED);
+                isDSPConnected.postValue(false);
             }
 
             @Override
@@ -124,10 +128,10 @@ public class CAGOPSPanelViewModel extends ViewModel {
 
         ledAudioRepository.connect(ip, port);
         ((IDSPRepository) ledAudioRepository).setChannel(DSPChannel.CH_1);
-        ((IDSPRepository) ledAudioRepository).setVolume(411);
+        ((IDSPRepository) ledAudioRepository).setVolume(50);
         ((IDSPRepository) ledAudioRepository).setMute(0);
 
-        volume.postValue(411);
+        volume.postValue(50);
 
         return ledAudioRepository;
     }
@@ -269,12 +273,7 @@ public class CAGOPSPanelViewModel extends ViewModel {
             return;
         }
         for (DisplayOutputItem item : items) {
-//            if (item.getDisplayName().equals("TV")) {
-//                ((LGTVRepository) item.getRoomDevice()).setMute(isMute);
-//            }
-
             if (item.getDisplayName().equals("DSP")) {
-
                 ((IDSPRepository) item.getRoomDevice()).setMute(isMute? 1 : 0);
             }
         }

@@ -69,6 +69,7 @@ public class CAGOPSPanel extends Fragment {
     private View btnVideo;
     private View btnControl;
     private View btnHome;
+    private ImageView imgDSPOnline;
 
     public static CAGOPSPanel newInstance() {
         return new CAGOPSPanel();
@@ -101,12 +102,14 @@ public class CAGOPSPanel extends Fragment {
         btnMute = view.findViewById(R.id.btnMute);
         btnPower = view.findViewById(R.id.btnPower);
         tvSelectedDevice = view.findViewById(R.id.tv_selected_device);
+        imgDSPOnline = view.findViewById(R.id.imgDSPOnline);
 
         // Warmup UI components
         layoutWarmup = view.findViewById(R.id.layoutWarmup);
         txtWarmupCountdown = view.findViewById(R.id.txtWarmupCountdown);
 
         tvRoomName.setText(mShareModel.getSelectedControlDevice().getRoomName());
+
 
         setupSourceDisplay(view);
         setupOutputDisplay(view);
@@ -181,6 +184,10 @@ public class CAGOPSPanel extends Fragment {
 
         mViewModel.getVolume().observe(getViewLifecycleOwner(), volume -> {
             this.volNum = volume;
+        });
+
+        mViewModel.getIsDSPConnected().observe(getViewLifecycleOwner(), isDSPConnected -> {
+            imgDSPOnline.setSelected(isDSPConnected);
         });
     }
 
@@ -324,15 +331,87 @@ public class CAGOPSPanel extends Fragment {
             if (displayOutputItems != null) {
                 displayOutputItems.clear();
                 displayOutputItems = null;
+            } else {
+                displayOutputItems = new ArrayList<>();
             }
 
-            displayOutputItems = new ArrayList<>();
+//            for(RoomDevice roomDevice : controlRoomDevices.roomDevices) {
+//                DisplayOutputItem displayOutputItem = new DisplayOutputItem(roomDevice, R.drawable.ic_output);
+//                displayOutputItem.setDeviceStatusVisible(true);
+//                displayOutputItems.add(displayOutputItem);
+//            }
 
-            for(RoomDevice roomDevice : controlRoomDevices.roomDevices) {
-                DisplayOutputItem displayOutputItem = new DisplayOutputItem(roomDevice, R.drawable.ic_output);
-                displayOutputItem.setDeviceStatusVisible(true);
-                displayOutputItems.add(displayOutputItem);
-            }
+            RoomDevice roomDevice1 = new RoomDevice();
+            roomDevice1.setId(63);
+            roomDevice1.setDeviceName("TV");
+            roomDevice1.setDeviceIpAddress("192.168.1.114");
+            roomDevice1.setDevicePort(9761);
+            roomDevice1.setDeviceDesc("Side Left TV");
+            roomDevice1.setOutPort(11);
+
+            DisplayOutputItem displayOutputItem1 = new DisplayOutputItem(roomDevice1, R.drawable.ic_output);
+            displayOutputItem1.setDeviceStatusVisible(true);
+            displayOutputItems.add(displayOutputItem1);
+
+            RoomDevice roomDevice2 = new RoomDevice();
+            roomDevice2.setId(64);
+            roomDevice2.setDeviceName("TV");
+            roomDevice2.setDeviceIpAddress("192.168.1.115");
+            roomDevice2.setDevicePort(9761);
+            roomDevice2.setDeviceDesc("Side Right TV");
+            roomDevice2.setOutPort(12);
+
+            DisplayOutputItem displayOutputItem2 = new DisplayOutputItem(roomDevice2, R.drawable.ic_output);
+            displayOutputItem2.setDeviceStatusVisible(true);
+            displayOutputItems.add(displayOutputItem2);
+
+            RoomDevice roomDevice3 = new RoomDevice();
+            roomDevice3.setId(61);
+            roomDevice3.setDeviceName("TV");
+            roomDevice3.setDeviceIpAddress("192.168.1.112");
+            roomDevice3.setDevicePort(9761);
+            roomDevice3.setDeviceDesc("Front Left TV");
+            roomDevice3.setOutPort(9);
+
+            DisplayOutputItem displayOutputItem3 = new DisplayOutputItem(roomDevice3, R.drawable.ic_output);
+            displayOutputItem3.setDeviceStatusVisible(true);
+            displayOutputItems.add(displayOutputItem3);
+
+            RoomDevice roomDevice4 = new RoomDevice();
+            roomDevice4.setId(62);
+            roomDevice4.setDeviceName("TV");
+            roomDevice4.setDeviceIpAddress("192.168.1.113");
+            roomDevice4.setDevicePort(9761);
+            roomDevice4.setDeviceDesc("Front Right TV");
+            roomDevice4.setOutPort(10);
+
+            DisplayOutputItem displayOutputItem4 = new DisplayOutputItem(roomDevice4, R.drawable.ic_output);
+            displayOutputItem4.setDeviceStatusVisible(true);
+            displayOutputItems.add(displayOutputItem4);
+
+            RoomDevice roomDevice5 = new RoomDevice();
+            roomDevice5.setId(60);
+            roomDevice5.setDeviceName("Switch");
+            roomDevice5.setDeviceIpAddress("192.168.1.151");
+            roomDevice5.setDevicePort(8000);
+            roomDevice5.setDeviceDesc("Switch");
+            roomDevice5.setOutPort(0);
+
+            DisplayOutputItem displayOutputItem5 = new DisplayOutputItem(roomDevice5, R.drawable.ic_output);
+            displayOutputItem5.setDeviceStatusVisible(true);
+            displayOutputItems.add(displayOutputItem5);
+
+            RoomDevice roomDevice6 = new RoomDevice();
+            roomDevice6.setId(65);
+            roomDevice6.setDeviceName("DSP");
+            roomDevice6.setDeviceIpAddress("192.168.1.172");
+            roomDevice6.setDevicePort(17300);
+            roomDevice6.setDeviceDesc("CAG OPS DSP");
+            roomDevice6.setOutPort(0);
+
+            DisplayOutputItem displayOutputItem6 = new DisplayOutputItem(roomDevice6, R.drawable.ic_output);
+            displayOutputItem6.setDeviceStatusVisible(true);
+            displayOutputItems.add(displayOutputItem6);
 
             mViewModel.connectAllDevices(displayOutputItems);
 
