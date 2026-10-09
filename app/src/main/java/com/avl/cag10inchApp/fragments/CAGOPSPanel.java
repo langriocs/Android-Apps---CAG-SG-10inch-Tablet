@@ -240,9 +240,6 @@ public class CAGOPSPanel extends Fragment {
                 mViewModel.setSelectedDeviceTurnOn();
                 mViewModel.changeTVInputSource(TVInputSource.HDMI_2);
             }
-
-
-
         });
 
         rvSelectOutput.setAdapter(displayOutputAdapter);
