@@ -97,6 +97,10 @@ public class HallPanel extends Fragment {
             btnDirectMode.setSelected(false);
             mViewModel.setSelectedDisplayMode(DisplayMode.SINGLE);
             mViewModel.setPreset(LEDPreset.PRESET_1);
+
+            setNavigationButtonState(NavigationState.SOURCE_STATE);
+            switchLayoutDisplay(HallPanelView.HALL_SOURCE_SELECT);
+            mViewModel.showSourceDisplay();
         });
 
         btnDoubleMode.setOnClickListener(v -> {
@@ -106,6 +110,10 @@ public class HallPanel extends Fragment {
 
             mViewModel.setSelectedDisplayMode(DisplayMode.DOUBLE);
             mViewModel.setPreset(LEDPreset.PRESET_2);
+
+            setNavigationButtonState(NavigationState.SOURCE_STATE);
+            switchLayoutDisplay(HallPanelView.HALL_SOURCE_SELECT);
+            mViewModel.showSourceDisplay();
         });
 
         btnDirectMode.setOnClickListener(v -> {
@@ -114,6 +122,11 @@ public class HallPanel extends Fragment {
             btnDirectMode.setSelected(true);
             mViewModel.setSelectedDisplayMode(DisplayMode.DIRECT);
             mViewModel.setPreset(LEDPreset.PRESET_3);
+
+
+//            setNavigationButtonState(NavigationState.SOURCE_STATE);
+//            switchLayoutDisplay(HallPanelView.HALL_SOURCE_SELECT);
+//            mViewModel.showSourceDisplay();
         });
     }
 
