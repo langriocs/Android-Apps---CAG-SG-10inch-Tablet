@@ -95,7 +95,6 @@ public class HallPanel extends Fragment {
             btnSingleMode.setSelected(true);
             btnDoubleMode.setSelected(false);
             btnDirectMode.setSelected(false);
-
             mViewModel.setSelectedDisplayMode(DisplayMode.SINGLE);
             mViewModel.setPreset(LEDPreset.PRESET_1);
         });
@@ -136,14 +135,19 @@ public class HallPanel extends Fragment {
             btnHall1Usb2.setSelected(false);
             btnHall1Wireless.setSelected(false);
             mViewModel.setSelectedSource(usb1);
-            mViewModel.routeSourceToSingle();
+            if (mViewModel.getSelectedDisplayMode() == DisplayMode.SINGLE) {
+                mViewModel.routeSourceToSingle();
+            }
+
         });
         btnHall1Usb2.setOnClickListener(v -> {
             btnHall1Usb1.setSelected(false);
             btnHall1Usb2.setSelected(true);
             btnHall1Wireless.setSelected(false);
             mViewModel.setSelectedSource(usb2);
-            mViewModel.routeSourceToSingle();
+            if (mViewModel.getSelectedDisplayMode() == DisplayMode.SINGLE) {
+                mViewModel.routeSourceToSingle();
+            }
 
         });
         btnHall1Wireless.setOnClickListener(v -> {
@@ -151,16 +155,19 @@ public class HallPanel extends Fragment {
             btnHall1Usb2.setSelected(false);
             btnHall1Wireless.setSelected(true);
             mViewModel.setSelectedSource(wireless);
+            if (mViewModel.getSelectedDisplayMode() == DisplayMode.SINGLE) {
+                mViewModel.routeSourceToSingle();
+            }
         });
 
         btnHallLeftLedDisplay.setOnClickListener(v -> {
             btnHallLeftLedDisplay.setSelected(true);
-
-
+            mViewModel.routeSourceToLeft();
         });
 
         btnHallRightLedDisplay.setOnClickListener(v -> {
             btnHallRightLedDisplay.setSelected(true);
+            mViewModel.routeSourceToRight();
         });
 
     }
@@ -184,6 +191,12 @@ public class HallPanel extends Fragment {
         });
 
         btnSource.setOnClickListener(view1 -> {
+            if (mViewModel.getSelectedDisplayMode() == null) {
+                return;
+            }
+            if (mViewModel.getSelectedDisplayMode() == DisplayMode.DIRECT) {
+                return;
+            }
             setNavigationButtonState(NavigationState.SOURCE_STATE);
             switchLayoutDisplay(HallPanelView.HALL_SOURCE_SELECT);
             mViewModel.showSourceDisplay();
@@ -244,7 +257,7 @@ public class HallPanel extends Fragment {
 
         if (hallPanel == HallPanelView.HALL_SOURCE_SELECT) {
             layoutMenu.setVisibility(View.GONE);
-            layoutDisplayMode.setVisibility(View.VISIBLE);
+            layoutDisplayMode.setVisibility(View.GONE);
             layoutSource.setVisibility(View.VISIBLE);
             bottomNavigation.setVisibility(View.VISIBLE);
         }
@@ -287,12 +300,16 @@ public class HallPanel extends Fragment {
             if (displayMode == null) {
                 return;
             }
-            if (displayMode == DisplayMode.DIRECT) {
+            if (displayMode == DisplayMode.SINGLE) {
                 // dnt show Display Out Device
+                outputSelectPanel.setVisibility(View.GONE);
             }
             if (displayMode == DisplayMode.DOUBLE) {
                 // show double display out device
                 outputSelectPanel.setVisibility(View.VISIBLE);
+            }
+            if (displayMode == DisplayMode.DIRECT) {
+
             }
 
         });

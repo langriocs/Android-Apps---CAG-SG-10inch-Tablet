@@ -51,8 +51,12 @@ public class TCPClient implements Runnable {
     }
 
     public void connect(String ip, int port) {
-        if (ip == null || ip.isEmpty()) {
+        if (ip == null || ip.trim().isEmpty()) {
             Log.e(tag, "Connect failed: IP is null or empty");
+            return;
+        }
+
+        if (port < 1 || port > 65535) {
             return;
         }
 
@@ -216,12 +220,12 @@ public class TCPClient implements Runnable {
                 // Explicitly use InetSocketAddress for connection with timeout
                 socket.connect(new InetSocketAddress(serverIp, serverPort), CONNECTION_TIMEOUT);
 
-                setConnected(true);
-                Log.i(tag, "Connected successfully to " + serverIp);
-
                 outputStream = socket.getOutputStream();
                 bufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(outputStream)), true);
                 bufferIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+                setConnected(true);
+                Log.i(tag, "Connected successfully to " + serverIp);
 
                 while (running) {
                     String message = bufferIn.readLine();

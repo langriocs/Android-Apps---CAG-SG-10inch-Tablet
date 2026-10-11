@@ -56,7 +56,6 @@ public class HallPanelViewModel extends ViewModel {
         return displayMode;
     }
 
-
     private IRoomDevice connectLEDWall(String ip, int port) {
         IRoomDevice ledWallRepository = new LEDWallRepository();
         ((ILEDWallRepository) ledWallRepository).setListener(new ILEDWallListener() {
@@ -183,12 +182,16 @@ public class HallPanelViewModel extends ViewModel {
     private DisplayOutputItem getSelectedDeviceByIP(String ip) {
         List<DisplayOutputItem> items = displayOutputItems.getValue();
 
+        if (items == null) {
+            return null;
+        }
+
         for (DisplayOutputItem item : items) {
-            if (item.getDisplayName().equals("LED_WALL")) {
-                if (item.getDeviceIp().equals(ip)) {
-                    return item;
-                }
+
+            if (item.getDeviceIp().equals(ip)) {
+                return item;
             }
+
         }
 
         return null;
@@ -203,7 +206,7 @@ public class HallPanelViewModel extends ViewModel {
         ( (ISwitchRepository) item.getRoomDevice()).routeAV(selectedSourceDevice.getPortNumber(),1);
     }
 
-    public void routeSourceToDouble() {
+    public void routeSourceToLeft() {
         DisplayOutputItem item = getSelectedDeviceByIP("192.168.1.151");
         if (item == null) {
             return;
@@ -212,8 +215,20 @@ public class HallPanelViewModel extends ViewModel {
         ( (ISwitchRepository) item.getRoomDevice()).routeAV(selectedSourceDevice.getPortNumber(),1);
     }
 
+    public void routeSourceToRight() {
+        DisplayOutputItem item = getSelectedDeviceByIP("192.168.1.151");
+        if (item == null) {
+            return;
+        }
+
+        ( (ISwitchRepository) item.getRoomDevice()).routeAV(selectedSourceDevice.getPortNumber(),2);
+    }
+
     public void setSelectedDisplayMode(DisplayMode selectedDisplayMode) {
         this.selectedDisplayMode = selectedDisplayMode;
+    }
+    public DisplayMode getSelectedDisplayMode() {
+        return selectedDisplayMode;
     }
 
     public void showSourceDisplay() {
