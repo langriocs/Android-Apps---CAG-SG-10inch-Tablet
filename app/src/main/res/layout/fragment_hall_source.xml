@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_hall_card"
+        android:orientation="vertical"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        >
+
+        <LinearLayout
+            android:id="@+id/source_select_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+            <ImageView
+                android:id="@+id/img_step_number"
+                android:layout_width="50dp"
+                android:layout_height="50dp" />
+
+            <ImageView
+                android:id="@+id/img_display_mode"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/ic_source"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                />
+
+            <TextView
+                android:id="@+id/txt_disply_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Choose source"
+                android:textSize="24sp"
+                android:textColor="@color/white"
+                android:layout_marginTop="50dp"
+                android:layout_marginStart="16dp"
+                />
+
+            <View
+                android:layout_height="12dp"
+                android:layout_width="100dp"
+                />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/btn_hall1_usb1"
+                android:layout_width="200dp"
+                android:layout_height="180dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:background="@drawable/bg_rounded_card_selector" >
+
+                <ImageView
+                    android:id="@+id/img_hall1_usb1"
+                    android:layout_width="100dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="50dp"
+                    android:src="@drawable/ic_usb_c"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="@string/usb_c_source_button"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    />
+
+                <TextView
+                    android:id="@+id/txt_usbc1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="USB-C 1"
+                    android:textColor="#FFFFFF"
+                    android:textSize="24sp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/img_hall1_usb1" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/btn_hall1_usb2"
+                android:layout_width="200dp"
+                android:layout_height="180dp"
+                android:layout_marginStart="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:background="@drawable/bg_rounded_card_selector" >
+
+                <ImageView
+                    android:id="@+id/img_hall1_usb2"
+                    android:layout_width="100dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="50dp"
+                    android:src="@drawable/ic_usb_c"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="@string/usb_c_source_button"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    />
+
+                <TextView
+                    android:id="@+id/txt_usbc2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="USB-C 2"
+                    android:textColor="#FFFFFF"
+                    android:textSize="24sp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/img_hall1_usb2" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/btn_hall1_wireless"
+                android:layout_width="200dp"
+                android:layout_height="180dp"
+                android:layout_marginStart="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:background="@drawable/bg_rounded_card_selector" >
+
+                <ImageView
+                    android:id="@+id/img_hall1_wireless"
+                    android:layout_width="100dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="50dp"
+                    android:src="@drawable/ic_wireless_share"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="@string/usb_c_source_button"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    />
+
+                <TextView
+                    android:id="@+id/txt_wireless_share"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Wireless Share"
+                    android:textColor="#FFFFFF"
+                    android:textSize="24sp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/img_hall1_wireless" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/output_select_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:visibility="visible"
+            >
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/btn_hall_left_led_display"
+                android:layout_width="200dp"
+                android:layout_height="180dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_rounded_card_selector"
+                android:clickable="true"
+                android:focusable="true"
+                android:scaleType="fitCenter"
+                tools:layout_editor_absoluteY="510dp">
+
+                <ImageView
+                    android:id="@+id/img_hall_left_led_display"
+                    android:layout_width="200dp"
+                    android:layout_height="80dp"
+                    android:layout_marginTop="20dp"
+                    android:contentDescription="@string/usb_c_source_button"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_display"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/txt_hall_left_led_display"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Left LED Display"
+                    android:textColor="#FFFFFF"
+                    android:textSize="24sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/img_hall_left_led_display" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/btn_hall_right_led_display"
+                android:layout_width="200dp"
+                android:layout_height="180dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_rounded_card_selector"
+                android:clickable="true"
+                android:focusable="true"
+                android:scaleType="fitCenter"
+                tools:layout_editor_absoluteY="510dp">
+
+                <ImageView
+                    android:id="@+id/img_hall_right_led_display"
+                    android:layout_width="200dp"
+                    android:layout_height="80dp"
+                    android:layout_marginTop="20dp"
+                    android:contentDescription="@string/usb_c_source_button"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_display"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/txt_hall_right_led_display"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Right LED Display"
+                    android:textColor="#FFFFFF"
+                    android:textSize="24sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/img_hall_right_led_display" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

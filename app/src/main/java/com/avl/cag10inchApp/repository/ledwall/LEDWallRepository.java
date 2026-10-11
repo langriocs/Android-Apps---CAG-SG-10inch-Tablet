@@ -49,18 +49,18 @@ public class LEDWallRepository implements ILEDWallRepository, IRoomDevice {
     }
 
     @Override
-    public void setPreset(int preset) {
-        if (preset == 1) {
-            tcpClient.sendHex("U AA 00 00 FE 00 00 00 00 00 01 00 00 01Q 13 01 00 00 BAV\r");
+    public void setPreset(LEDPreset preset) {
+        if (preset == LEDPreset.PRESET_1) {
+            tcpClient.sendHex("55 aa 00 00 fe 00 00 00 00 00 01 00 00 01 51 13 01 00 00 BA 56 0D");
         }
-        if (preset == 2) {
-            tcpClient.sendHex("55 AA 00 00 FE 00 00 00 00 00 01 00 00 01 51 13 01 00 01 B7 56\r");
+        if (preset == LEDPreset.PRESET_2) {
+            tcpClient.sendHex("55 aa 00 00 fe 00 00 00 00 00 01 00 00 01 51 13 01 00 01 bb 56 0D");
         }
-        if (preset == 3) {
-            tcpClient.sendHex("55 AA 00 00 FE 00 00 00 00 00 01 00 00 01 51 13 01 00 02 B8 56\r");
+        if (preset == LEDPreset.PRESET_3) {
+            tcpClient.sendHex("55 aa 00 00 fe 00 00 00 00 00 01 00 00 01 51 13 01 00 02 bc 56 0D");
         }
-        if (preset == 4) {
-            tcpClient.sendHex("U AA 00 00 FE 00 00 00 00 00 01 00 00 01Q 13 01 00 03 BDV\r");
+        if (preset == LEDPreset.PRESET_4) {
+            tcpClient.sendHex("55 aa 00 00 fe 00 00 00 00 00 01 00 00 01 51 13 01 00 03 bd 56 0D");
         }
     }
 

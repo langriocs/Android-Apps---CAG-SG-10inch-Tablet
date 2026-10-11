@@ -15,6 +15,7 @@ import com.avl.cag10inchApp.repository.audio.IAudioListener;
 import com.avl.cag10inchApp.repository.audio.IDSPRepository;
 import com.avl.cag10inchApp.repository.ledwall.ILEDWallListener;
 import com.avl.cag10inchApp.repository.ledwall.ILEDWallRepository;
+import com.avl.cag10inchApp.repository.ledwall.LEDPreset;
 import com.avl.cag10inchApp.repository.ledwall.LEDWallRepository;
 import com.avl.cag10inchApp.repository.switcher.ISwitchRepository;
 import com.avl.cag10inchApp.repository.switcher.Switch32x32Repository;
@@ -420,7 +421,7 @@ public class TrainingPanelViewModel extends ViewModel {
         for (DisplayOutputItem item : items) {
             if (item.getRoomDevice() instanceof LEDWallRepository) {
                 // set the preset
-                ((LEDWallRepository) item.getRoomDevice()).setPreset(4);
+                ((LEDWallRepository) item.getRoomDevice()).setPreset(LEDPreset.PRESET_4);
                 break;
             }
         }

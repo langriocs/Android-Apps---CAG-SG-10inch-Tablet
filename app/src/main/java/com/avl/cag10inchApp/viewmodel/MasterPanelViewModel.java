@@ -16,6 +16,7 @@ import com.avl.cag10inchApp.repository.audio.IAudioListener;
 import com.avl.cag10inchApp.repository.audio.IDSPRepository;
 import com.avl.cag10inchApp.repository.ledwall.ILEDWallListener;
 import com.avl.cag10inchApp.repository.ledwall.ILEDWallRepository;
+import com.avl.cag10inchApp.repository.ledwall.LEDPreset;
 import com.avl.cag10inchApp.repository.ledwall.LEDWallRepository;
 import com.avl.cag10inchApp.repository.switcher.ISwitchListener;
 import com.avl.cag10inchApp.repository.switcher.ISwitchRepository;
@@ -81,7 +82,7 @@ public class MasterPanelViewModel extends ViewModel {
 
         IRoomDevice roomDevice = outputDevices.get(selectedOutput.getDeviceId());
         if (roomDevice instanceof LEDWallRepository) {
-            ((LEDWallRepository) roomDevice).setPreset(1);
+            ((LEDWallRepository) roomDevice).setPreset(LEDPreset.PRESET_1);
         }
 
         if (roomDevice instanceof LGTVRepository ) {
@@ -168,7 +169,7 @@ public class MasterPanelViewModel extends ViewModel {
         IRoomDevice roomDevice = controlDeviceItems.get(controlSwitchItem.getIpAddress());
 
         if (roomDevice instanceof LEDWallRepository) {
-            ((LEDWallRepository) roomDevice).setPreset(1);
+            ((LEDWallRepository) roomDevice).setPreset(LEDPreset.PRESET_1);
         }
 
         if (roomDevice instanceof LGTVRepository ) {

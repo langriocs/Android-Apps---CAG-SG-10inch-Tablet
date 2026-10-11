@@ -49,4 +49,8 @@
     <string name="select_output">Select output</string>
     <string name="hdmi_direct">HDMI Direct</string>
     <string name="microsoft_team">Microsoft Team</string>
+    <string name="audio">AUDIO</string>
+    <string name="camera">CAMERA</string>
+    <string name="source">SOURCE</string>
+    <string name="display">DISPLAY</string>
 </resources>

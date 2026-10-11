@@ -48,8 +48,13 @@ public class DSPRepository implements IDSPRepository, IRoomDevice {
         });
     }
 
+
+
     private void handleMessage(String message) {
 
+        if (message.startsWith("ACK")) {
+
+        }
     }
 
     @Override
@@ -79,7 +84,7 @@ public class DSPRepository implements IDSPRepository, IRoomDevice {
 
     @Override
     public void setVolume(int volume) {
-        int faderValue = 311 + (volume * 2);
+        int faderValue = 155 + (volume * 2);
         tcpClient.sendMessage("SICL S 0000 00 NC "+ channel.getValue() +","+ faderValue +" \r");
     }
 

@@ -53,7 +53,11 @@
         android:id="@+id/hallPanel"
         android:name="com.avl.cag10inchApp.fragments.HallPanel"
         android:label="fragment_hall_panel"
-        tools:layout="@layout/fragment_hall_panel" />
+        tools:layout="@layout/fragment_hall_panel" >
+        <action
+            android:id="@+id/action_hallPanel_to_splashScreen1"
+            app:destination="@id/splashScreen1" />
+    </fragment>
     <fragment
         android:id="@+id/briefingPanel"
         android:name="com.avl.cag10inchApp.fragments.BriefingPanel"
