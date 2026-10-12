@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
@@ -454,7 +455,7 @@ public class HallPanel extends Fragment {
     private void setupOutputCombine(View view) {
 
         rcvOutput = view.findViewById(R.id.rcv_output);
-        GridLayoutManager layoutManager = new GridLayoutManager(requireContext(),8, GridLayoutManager.VERTICAL,false);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL,false);
         rcvOutput.setLayoutManager(layoutManager);
 
         ledOutputAdapter = new LEDPanelOutAdapter(item -> {
@@ -475,9 +476,6 @@ public class HallPanel extends Fragment {
         btnCombine2USB2 = view.findViewById(R.id.btn_combine2_usb2);
         btnCombine2Wireless = view.findViewById(R.id.btn_combine2_wireless);
 
-//        View btn1 = view.findViewById(R.id.btn_1);
-//        View btn2 = view.findViewById(R.id.btn_2);
-//        View btn3 = view.findViewById(R.id.btn_3);
 
         DisplaySourceItem usb1 = new DisplaySourceItem("USB-C 1", 1, R.drawable.ic_usb_c, false );
         DisplaySourceItem usb2 = new DisplaySourceItem("USB-C 2", 2, R.drawable.ic_usb_c, false );
@@ -519,20 +517,6 @@ public class HallPanel extends Fragment {
             btnCombine2Wireless.setSelected(true);
             mViewModel.setSelectedSource(combineWireless);
         });
-
-//        btn1.setOnClickListener(view1 -> {
-//            mViewModel.routeSourceToSingle();
-//            mViewModel.routeDSP();
-//        });
-//        btn2.setOnClickListener(view1 -> {
-//            mViewModel.routeSourceTo2A();
-//            mViewModel.routeDSP();
-//        });
-//        btn3.setOnClickListener(view1 -> {
-//            mViewModel.routeSourceTo2B();
-//            mViewModel.routeDSP();
-//        });
-
     }
 
     private void setCombineHallButtonState() {
