@@ -12,8 +12,8 @@ import com.avl.cag10inchApp.R;
 
 public class ItemSourceHolder extends RecyclerView.ViewHolder {
 
-    ImageView imgItem = itemView.findViewById(R.id.imgDisplay);
-    TextView txtItem = itemView.findViewById(R.id.txtDisplay);
+    ImageView imgItem ;
+    TextView txtItem ;
     View _itemView;
 
     public ItemSourceHolder(@NonNull View itemView) {

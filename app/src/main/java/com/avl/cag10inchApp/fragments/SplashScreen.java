@@ -68,12 +68,12 @@ public class SplashScreen extends Fragment {
             }
         });
 
-        final String ipAddress = "192.168.1.150"; // Hall 1 and 2
+//        final String ipAddress = "192.168.1.150"; // Hall 1 and 2
 //        final String ipAddress = "192.168.1.110"; // CAG OPS
 //        final String ipAddress = "192.168.1.131"; // Master
 //        final String ipAddress = "192.168.1.130"; // Briefing
 //        final String ipAddress = "192.168.1.100"; // Training
-//        final String ipAddress = MyLibUtil.getIPAddress(true);
+        final String ipAddress = MyLibUtil.getIPAddress(true);
         shareViewModel.fetchControlDeviceByIpAddress(ipAddress);
     }
 

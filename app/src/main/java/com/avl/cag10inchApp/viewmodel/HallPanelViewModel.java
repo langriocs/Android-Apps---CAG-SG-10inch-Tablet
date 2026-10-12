@@ -6,9 +6,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.avl.cag10inchApp.R;
 import com.avl.cag10inchApp.model.DisplayMode;
 import com.avl.cag10inchApp.model.DisplayOutputItem;
 import com.avl.cag10inchApp.model.DisplaySourceItem;
+import com.avl.cag10inchApp.model.Hall;
+import com.avl.cag10inchApp.model.HallOperation;
+import com.avl.cag10inchApp.model.LEDPanelOutput;
 import com.avl.cag10inchApp.repository.IRoomDevice;
 import com.avl.cag10inchApp.repository.audio.DSPChannel;
 import com.avl.cag10inchApp.repository.audio.DSPRepository;
@@ -22,19 +26,27 @@ import com.avl.cag10inchApp.repository.switcher.ISwitchListener;
 import com.avl.cag10inchApp.repository.switcher.ISwitchRepository;
 import com.avl.cag10inchApp.repository.switcher.Switch32x32Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HallPanelViewModel extends ViewModel {
     private MutableLiveData<Boolean> isSwitcherConnected = new MutableLiveData<>(false);
     private MutableLiveData<Boolean> isDSPConnected = new MutableLiveData<>(false);
     private MutableLiveData<Boolean> isLEDConnected = new MutableLiveData<>(false);
-    private MutableLiveData<List<DisplayOutputItem>> displayOutputItems = new MutableLiveData<>();
+    private MutableLiveData<List<LEDPanelOutput>> ledPanelOutputList = new MutableLiveData<>();
     private MutableLiveData<Integer> volume = new MutableLiveData<>(50);
     private MutableLiveData<Boolean> isSystemInitialized = new MutableLiveData<>(false);
     private MutableLiveData<DisplayMode> displayMode = new MutableLiveData<>(null);
+    private MutableLiveData<List<DisplayOutputItem>> displayOutputItems = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isRightLedSelected = new MutableLiveData<>(false);
+    private MutableLiveData<Boolean> isLeftLedSelected = new MutableLiveData<>(false);
 
     private DisplaySourceItem selectedSourceDevice;
     private DisplayMode selectedDisplayMode;
+    private HallOperation hallOperation;
+    private DisplayMode hall1CombineDisplayMode;
+    private DisplayMode hall2ACombineDisplayMode;
+    private DisplayMode hall2BCombineDisplayMode;
 
     public HallPanelViewModel() {
 
@@ -54,6 +66,15 @@ public class HallPanelViewModel extends ViewModel {
     }
     public LiveData<DisplayMode> getDisplayMode() {
         return displayMode;
+    }
+    public LiveData<List<LEDPanelOutput>> getLedPanelOutputList() {
+        return ledPanelOutputList;
+    }
+    public LiveData<Boolean> getIsRightLedSelected() {
+        return isRightLedSelected;
+    }
+    public LiveData<Boolean> getIsLeftLedSelected() {
+        return isLeftLedSelected;
     }
 
     private IRoomDevice connectLEDWall(String ip, int port) {
@@ -167,16 +188,28 @@ public class HallPanelViewModel extends ViewModel {
     }
 
     public void setSelectedSource(DisplaySourceItem item) {
+
         selectedSourceDevice = item;
     }
 
-    public void setPreset(LEDPreset preset) {
-        DisplayOutputItem item = getSelectedDeviceByIP("192.168.1.152");
-        if (item == null) {
+    public void setPreset(LEDPreset preset, Hall hall) {
+        DisplayOutputItem switcher = null;
+
+        if (hall == Hall.HALL_1) {
+            switcher = getSelectedDeviceByIP("192.168.1.152");
+        }
+        if (hall == Hall.HALL_2A) {
+            switcher = getSelectedDeviceByIP("192.168.1.162");
+        }
+        if (hall == Hall.HALL_2B) {
+            switcher = getSelectedDeviceByIP("192.168.1.163");
+        }
+
+        if (switcher == null) {
             return;
         }
 
-        ( (ILEDWallRepository)  item.getRoomDevice()).setPreset(preset);
+        ( (ILEDWallRepository)  switcher.getRoomDevice()).setPreset(preset);
     }
 
     private DisplayOutputItem getSelectedDeviceByIP(String ip) {
@@ -203,6 +236,10 @@ public class HallPanelViewModel extends ViewModel {
             return;
         }
 
+        if (selectedSourceDevice == null) {
+            return;
+        }
+
         ( (ISwitchRepository) item.getRoomDevice()).routeAV(selectedSourceDevice.getPortNumber(),1);
     }
 
@@ -211,6 +248,10 @@ public class HallPanelViewModel extends ViewModel {
         if (item == null) {
             return;
         }
+        if (selectedSourceDevice == null) {
+            return;
+        }
+
 
         ( (ISwitchRepository) item.getRoomDevice()).routeAV(selectedSourceDevice.getPortNumber(),1);
     }
@@ -220,8 +261,26 @@ public class HallPanelViewModel extends ViewModel {
         if (item == null) {
             return;
         }
+        if (selectedSourceDevice == null) {
+            return;
+        }
+
 
         ( (ISwitchRepository) item.getRoomDevice()).routeAV(selectedSourceDevice.getPortNumber(),2);
+    }
+
+    public void routeDSP() {
+        DisplayOutputItem item = getSelectedDeviceByIP("192.168.1.151");
+        if (item == null) {
+            return;
+        }
+        if (selectedSourceDevice == null) {
+            return;
+        }
+
+        ( (ISwitchRepository) item.getRoomDevice()).routeAV(selectedSourceDevice.getPortNumber(),24);
+        ( (ISwitchRepository) item.getRoomDevice()).routeAV(selectedSourceDevice.getPortNumber(),25);
+
     }
 
     public void setSelectedDisplayMode(DisplayMode selectedDisplayMode) {
@@ -233,5 +292,109 @@ public class HallPanelViewModel extends ViewModel {
 
     public void showSourceDisplay() {
         displayMode.postValue(selectedDisplayMode);
+    }
+
+    public void setHallOperation(HallOperation hallOperation) {
+        this.hallOperation = hallOperation;
+    }
+
+    public HallOperation getHallOperation() {
+        return hallOperation;
+    }
+
+    public void setSelectedHall1CombineDisplayMode(DisplayMode displayMode) {
+        hall1CombineDisplayMode = displayMode;
+    }
+
+    public void setSelectedHall2ACombineDisplayMode(DisplayMode displayMode) {
+        hall2ACombineDisplayMode = displayMode;
+    }
+
+    public void setSelectedHall2BCombineDisplayMode(DisplayMode displayMode) {
+        hall2BCombineDisplayMode = displayMode;
+    }
+
+    public void showSourceCombineDisplay() {
+
+        List<LEDPanelOutput> ledOutputList = ledPanelOutputList.getValue();
+        if (ledOutputList == null) {
+            ledOutputList = new ArrayList<>();
+        }
+
+        if (hall1CombineDisplayMode != null) {
+            if (hall1CombineDisplayMode == DisplayMode.SINGLE) {
+                LEDPanelOutput ledPanelOutput = new LEDPanelOutput("Hall1", R.drawable.ic_output);
+                ledOutputList.add(ledPanelOutput);
+
+            }
+            if (hall1CombineDisplayMode == DisplayMode.DOUBLE) {
+                LEDPanelOutput ledPanelOutput1 = new LEDPanelOutput("Hall1 Left", R.drawable.ic_output);
+                LEDPanelOutput ledPanelOutput2 = new LEDPanelOutput("Hall1 Right", R.drawable.ic_output);
+                ledOutputList.add(ledPanelOutput1);
+                ledOutputList.add(ledPanelOutput2);
+            }
+        }
+
+        if (hall2ACombineDisplayMode != null) {
+            if (hall2ACombineDisplayMode == DisplayMode.SINGLE) {
+                LEDPanelOutput led2APanelOutput = new LEDPanelOutput("2A Single", R.drawable.ic_output);
+                ledOutputList.add(led2APanelOutput);
+            }
+
+            if (hall2ACombineDisplayMode == DisplayMode.DOUBLE) {
+                LEDPanelOutput led2APanelOutput1 = new LEDPanelOutput("2A Left", R.drawable.ic_output);
+                LEDPanelOutput led2APanelOutput2 = new LEDPanelOutput("2A Right", R.drawable.ic_output);
+                ledOutputList.add(led2APanelOutput1);
+                ledOutputList.add(led2APanelOutput2);
+            }
+        }
+
+        if (hall2BCombineDisplayMode != null) {
+            if (hall2BCombineDisplayMode == DisplayMode.SINGLE) {
+                LEDPanelOutput led2BPanelOutput = new LEDPanelOutput("2B Single", R.drawable.ic_output);
+                ledOutputList.add(led2BPanelOutput);
+            }
+            if (hall2BCombineDisplayMode == DisplayMode.DOUBLE) {
+                LEDPanelOutput led2BPanelOutput1 = new LEDPanelOutput("2B Left", R.drawable.ic_output);
+                LEDPanelOutput led2BPanelOutput2 = new LEDPanelOutput("2B Right", R.drawable.ic_output);
+                ledOutputList.add(led2BPanelOutput1);
+                ledOutputList.add(led2BPanelOutput2);
+            }
+        }
+
+        ledPanelOutputList.postValue(ledOutputList);
+
+
+    }
+
+    public void routeSourceTo2A() {
+        DisplayOutputItem item = getSelectedDeviceByIP("192.168.1.151");
+        if (item == null) {
+            return;
+        }
+
+        if (selectedSourceDevice == null) {
+            return;
+        }
+
+        ( (ISwitchRepository) item.getRoomDevice()).routeAV(selectedSourceDevice.getPortNumber(),3);
+    }
+
+    public void routeSourceTo2B() {
+        DisplayOutputItem item = getSelectedDeviceByIP("192.168.1.151");
+        if (item == null) {
+            return;
+        }
+
+        if (selectedSourceDevice == null) {
+            return;
+        }
+
+        ( (ISwitchRepository) item.getRoomDevice()).routeAV(selectedSourceDevice.getPortNumber(),5);
+    }
+
+    public void presetRecall() {
+        DisplayOutputItem item = getSelectedDeviceByIP("192.168.1.151");
+
     }
 }

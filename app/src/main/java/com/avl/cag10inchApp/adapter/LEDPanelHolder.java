@@ -1,0 +1,25 @@
+package com.avl.cag10inchApp.adapter;
+
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.avl.cag10inchApp.R;
+
+public class LEDPanelHolder extends RecyclerView.ViewHolder {
+    ImageView imgItem;
+    TextView txtItem ;
+    View _itemView;
+
+    public LEDPanelHolder(@NonNull View itemView) {
+        super(itemView);
+        _itemView = itemView;
+        imgItem = itemView.findViewById(R.id.imgDisplay);
+        txtItem = itemView.findViewById(R.id.txtDisplay);
+    }
+
+    public View getView() { return _itemView; }
+}

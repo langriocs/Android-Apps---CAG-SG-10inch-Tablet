@@ -78,6 +78,23 @@
             android:layout_height="match_parent"
             android:visibility="gone" />
 
+        <include
+            android:id="@+id/hall_combine"
+            layout="@layout/fragment_hall_combine"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            />
+
+        <include
+            android:id="@+id/hall_combine_source"
+            layout="@layout/fragment_hall_combine_source"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            />
+
+
     </FrameLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout

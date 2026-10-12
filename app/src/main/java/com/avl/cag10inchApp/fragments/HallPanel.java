@@ -8,6 +8,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,9 +17,14 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.avl.cag10inchApp.R;
+import com.avl.cag10inchApp.adapter.DisplayOutputAdapter;
+import com.avl.cag10inchApp.adapter.LEDPanelOutAdapter;
 import com.avl.cag10inchApp.model.DisplayMode;
 import com.avl.cag10inchApp.model.DisplayOutputItem;
 import com.avl.cag10inchApp.model.DisplaySourceItem;
+import com.avl.cag10inchApp.model.Hall;
+import com.avl.cag10inchApp.model.HallOperation;
+import com.avl.cag10inchApp.model.LEDPanelOutput;
 import com.avl.cag10inchApp.model.vo.RoomDevice;
 import com.avl.cag10inchApp.repository.ledwall.LEDPreset;
 import com.avl.cag10inchApp.viewmodel.HallPanelView;
@@ -36,6 +43,8 @@ public class HallPanel extends Fragment {
     private View layoutMenu;
     private View layoutDisplayMode;
     private View layoutSource;
+    private View layoutCombine;
+    private View layoutCombineSource;
     private View bottomNavigation;
     private ConstraintLayout btnDisplay;
     private ConstraintLayout btnSource;
@@ -43,6 +52,19 @@ public class HallPanel extends Fragment {
     private ConstraintLayout btnCamera;
     private ConstraintLayout btnHome;
     private LinearLayout outputSelectPanel;
+    private RecyclerView rcvOutput;
+    private boolean isLeftLedSelected;
+    private boolean isRightLedSelected;
+    private LEDPanelOutAdapter ledOutputAdapter;
+    private List<LEDPanelOutput> ledPanelOutputList;
+
+    private View btnUSB1;
+    private View btnUSB2;
+    private View btnWireless;
+
+    private View btnCombine2USB1;
+    private View btnCombine2USB2;
+    private View btnCombine2Wireless;
 
 
     public static HallPanel newInstance() {
@@ -73,6 +95,8 @@ public class HallPanel extends Fragment {
         setupLayoutDisplay(view);
         setupDisplayMode(view);
         setupSource(view);
+        setupCombineHall(view);
+        setupOutputCombine(view);
         fetchControlDevicesData();
         observerViewModel();
     }
@@ -81,9 +105,12 @@ public class HallPanel extends Fragment {
         MaterialButton btnSeparateHall = view.findViewById(R.id.btn_separation_hall);
         MaterialButton btnCombineHall = view.findViewById(R.id.btn_combine_hall);
 
-        btnSeparateHall.setOnClickListener(v -> switchLayoutDisplay(HallPanelView.HALL_DISPLAY_MODE_SELECT));
+        btnSeparateHall.setOnClickListener(v -> {
+            switchLayoutDisplay(HallPanelView.HALL_DISPLAY_MODE_SELECT);
+            mViewModel.presetRecall();
+        });
 
-        btnCombineHall.setOnClickListener(v -> switchLayoutDisplay(HallPanelView.HALL_SOURCE_SELECT));
+        btnCombineHall.setOnClickListener(v -> switchLayoutDisplay(HallPanelView.HALL_COMBINE_MODE));
     }
 
     private void setupDisplayMode(View view) {
@@ -96,7 +123,7 @@ public class HallPanel extends Fragment {
             btnDoubleMode.setSelected(false);
             btnDirectMode.setSelected(false);
             mViewModel.setSelectedDisplayMode(DisplayMode.SINGLE);
-            mViewModel.setPreset(LEDPreset.PRESET_1);
+            mViewModel.setPreset(LEDPreset.PRESET_1, Hall.HALL_1);
 
             setNavigationButtonState(NavigationState.SOURCE_STATE);
             switchLayoutDisplay(HallPanelView.HALL_SOURCE_SELECT);
@@ -109,7 +136,7 @@ public class HallPanel extends Fragment {
             btnDirectMode.setSelected(false);
 
             mViewModel.setSelectedDisplayMode(DisplayMode.DOUBLE);
-            mViewModel.setPreset(LEDPreset.PRESET_2);
+            mViewModel.setPreset(LEDPreset.PRESET_2, Hall.HALL_1);
 
             setNavigationButtonState(NavigationState.SOURCE_STATE);
             switchLayoutDisplay(HallPanelView.HALL_SOURCE_SELECT);
@@ -121,12 +148,8 @@ public class HallPanel extends Fragment {
             btnDoubleMode.setSelected(false);
             btnDirectMode.setSelected(true);
             mViewModel.setSelectedDisplayMode(DisplayMode.DIRECT);
-            mViewModel.setPreset(LEDPreset.PRESET_3);
+            mViewModel.setPreset(LEDPreset.PRESET_3, Hall.HALL_1);
 
-
-//            setNavigationButtonState(NavigationState.SOURCE_STATE);
-//            switchLayoutDisplay(HallPanelView.HALL_SOURCE_SELECT);
-//            mViewModel.showSourceDisplay();
         });
     }
 
@@ -174,21 +197,24 @@ public class HallPanel extends Fragment {
         });
 
         btnHallLeftLedDisplay.setOnClickListener(v -> {
-            btnHallLeftLedDisplay.setSelected(true);
+            btnHallLeftLedDisplay.setSelected(isLeftLedSelected);
             mViewModel.routeSourceToLeft();
         });
 
         btnHallRightLedDisplay.setOnClickListener(v -> {
-            btnHallRightLedDisplay.setSelected(true);
+            btnHallRightLedDisplay.setSelected(isRightLedSelected);
             mViewModel.routeSourceToRight();
         });
 
     }
 
     private void setupLayoutDisplay(View view) {
+        layoutCombine = view.findViewById(R.id.hall_combine);
+        layoutCombineSource = view.findViewById(R.id.hall_combine_source);
         layoutDisplayMode = view.findViewById(R.id.hall_display_mode);
         layoutMenu = view.findViewById(R.id.hall_menu);
         layoutSource = view.findViewById(R.id.hall_source);
+
         bottomNavigation = view.findViewById(R.id.bottom_navigation);
         btnDisplay = view.findViewById(R.id.btn_display);
         btnSource = view.findViewById(R.id.btn_source);
@@ -199,20 +225,35 @@ public class HallPanel extends Fragment {
         setNavigationButtonState(NavigationState.DISPLAY_MODE_STATE);
 
         btnDisplay.setOnClickListener(v -> {
-            setNavigationButtonState(NavigationState.DISPLAY_MODE_STATE);
-            switchLayoutDisplay(HallPanelView.HALL_DISPLAY_MODE_SELECT);
+            if (mViewModel.getHallOperation() == HallOperation.COMBINE_HALL) {
+                setNavigationButtonState(NavigationState.DISPLAY_MODE_STATE);
+                switchLayoutDisplay(HallPanelView.HALL_COMBINE_MODE);
+            }
+            if (mViewModel.getHallOperation() == HallOperation.SEPARATE_HALL) {
+                setNavigationButtonState(NavigationState.DISPLAY_MODE_STATE);
+                switchLayoutDisplay(HallPanelView.HALL_DISPLAY_MODE_SELECT);
+            }
+
         });
 
         btnSource.setOnClickListener(view1 -> {
-            if (mViewModel.getSelectedDisplayMode() == null) {
-                return;
+            if (mViewModel.getHallOperation() == HallOperation.SEPARATE_HALL) {
+                if (mViewModel.getSelectedDisplayMode() == null) {
+                    return;
+                }
+                if (mViewModel.getSelectedDisplayMode() == DisplayMode.DIRECT) {
+                    return;
+                }
+                setNavigationButtonState(NavigationState.SOURCE_STATE);
+                switchLayoutDisplay(HallPanelView.HALL_SOURCE_SELECT);
+                mViewModel.showSourceDisplay();
             }
-            if (mViewModel.getSelectedDisplayMode() == DisplayMode.DIRECT) {
-                return;
+
+            if (mViewModel.getHallOperation() == HallOperation.COMBINE_HALL) {
+                setNavigationButtonState(NavigationState.SOURCE_STATE);
+                switchLayoutDisplay(HallPanelView.HALL_COMBINE_SOURCE);
+                mViewModel.showSourceCombineDisplay();
             }
-            setNavigationButtonState(NavigationState.SOURCE_STATE);
-            switchLayoutDisplay(HallPanelView.HALL_SOURCE_SELECT);
-            mViewModel.showSourceDisplay();
         });
 
         btnAudio.setOnClickListener(view1 -> {
@@ -227,7 +268,7 @@ public class HallPanel extends Fragment {
         });
 
         btnHome.setOnClickListener(view1 -> {
-            mViewModel.setPreset(LEDPreset.PRESET_4);
+            mViewModel.setPreset(LEDPreset.PRESET_4, Hall.HALL_1);
             btnHome.setSelected(true);
             Navigation.findNavController(view1).navigate(R.id.action_hallPanel_to_splashScreen1);
         });
@@ -259,21 +300,242 @@ public class HallPanel extends Fragment {
             layoutMenu.setVisibility(View.VISIBLE);
             layoutDisplayMode.setVisibility(View.GONE);
             layoutSource.setVisibility(View.GONE);
+            layoutCombine.setVisibility(View.GONE);
+            layoutCombineSource.setVisibility(View.GONE);
             bottomNavigation.setVisibility(View.GONE);
+            mViewModel.setHallOperation(HallOperation.HALL_MENU);
         }
+
         if (hallPanel == HallPanelView.HALL_DISPLAY_MODE_SELECT) {
             layoutMenu.setVisibility(View.GONE);
             layoutDisplayMode.setVisibility(View.VISIBLE);
             layoutSource.setVisibility(View.GONE);
+            layoutCombine.setVisibility(View.GONE);
+            layoutCombineSource.setVisibility(View.GONE);
             bottomNavigation.setVisibility(View.VISIBLE);
+            mViewModel.setHallOperation(HallOperation.SEPARATE_HALL);
         }
 
         if (hallPanel == HallPanelView.HALL_SOURCE_SELECT) {
             layoutMenu.setVisibility(View.GONE);
             layoutDisplayMode.setVisibility(View.GONE);
             layoutSource.setVisibility(View.VISIBLE);
+            layoutCombine.setVisibility(View.GONE);
+            layoutCombineSource.setVisibility(View.GONE);
             bottomNavigation.setVisibility(View.VISIBLE);
+            mViewModel.setHallOperation(HallOperation.SEPARATE_HALL);
         }
+
+        if (hallPanel == HallPanelView.HALL_COMBINE_MODE) {
+            layoutMenu.setVisibility(View.GONE);
+            layoutDisplayMode.setVisibility(View.GONE);
+            layoutSource.setVisibility(View.GONE);
+            layoutCombine.setVisibility(View.VISIBLE);
+            layoutCombineSource.setVisibility(View.GONE);
+            bottomNavigation.setVisibility(View.VISIBLE);
+            mViewModel.setHallOperation(HallOperation.COMBINE_HALL);
+        }
+
+        if (hallPanel == HallPanelView.HALL_COMBINE_SOURCE) {
+            layoutMenu.setVisibility(View.GONE);
+            layoutDisplayMode.setVisibility(View.GONE);
+            layoutSource.setVisibility(View.GONE);
+            layoutCombine.setVisibility(View.GONE);
+            layoutCombineSource.setVisibility(View.VISIBLE);
+            bottomNavigation.setVisibility(View.VISIBLE);
+            mViewModel.setHallOperation(HallOperation.COMBINE_HALL);
+        }
+    }
+
+    private void setupCombineHall(View view){
+        View btn1SingleMode = view.findViewById(R.id.btn_1_single_mode);
+        View btn1DoubleMode = view.findViewById(R.id.btn_1_double_mode);
+        View btn1DirectMode = view.findViewById(R.id.btn_1_direct_mode);
+        View btn2ASingleMode = view.findViewById(R.id.btn_2A_single_mode);
+        View btn2ADoubleMode = view.findViewById(R.id.btn_2A_double_mode);
+        View btn2ADirectMode = view.findViewById(R.id.btn_2A_direct_mode);
+        View btn2BSingleMode = view.findViewById(R.id.btn_2B_single_mode);
+        View btn2BDoubleMode = view.findViewById(R.id.btn_2B_double_mode);
+        View btn2BDirectMode = view.findViewById(R.id.btn_2B_direct_mode);
+
+        btn1SingleMode.setSelected(true);
+        btn2ASingleMode.setSelected(true);
+        btn2BSingleMode.setSelected(true);
+        mViewModel.setSelectedHall1CombineDisplayMode(DisplayMode.SINGLE);
+        mViewModel.setPreset(LEDPreset.PRESET_1, Hall.HALL_1);
+        mViewModel.setSelectedHall2ACombineDisplayMode(DisplayMode.SINGLE);
+        mViewModel.setPreset(LEDPreset.PRESET_1, Hall.HALL_2A);
+        mViewModel.setSelectedHall2BCombineDisplayMode(DisplayMode.SINGLE);
+        mViewModel.setPreset(LEDPreset.PRESET_1, Hall.HALL_2B);
+
+
+        btn1SingleMode.setOnClickListener(v -> {
+            btn1SingleMode.setSelected(true);
+            btn1DoubleMode.setSelected(false);
+            btn1DirectMode.setSelected(false);
+
+            mViewModel.setSelectedHall1CombineDisplayMode(DisplayMode.SINGLE);
+            mViewModel.setPreset(LEDPreset.PRESET_1, Hall.HALL_1);
+
+
+        });
+        btn1DoubleMode.setOnClickListener(v -> {
+            btn1SingleMode.setSelected(false);
+            btn1DoubleMode.setSelected(true);
+            btn1DirectMode.setSelected(false);
+            mViewModel.setSelectedHall1CombineDisplayMode(DisplayMode.DOUBLE);
+            mViewModel.setPreset(LEDPreset.PRESET_2, Hall.HALL_1);
+
+        });
+        btn1DirectMode.setOnClickListener(v -> {
+            btn1SingleMode.setSelected(false);
+            btn1DoubleMode.setSelected(false);
+            btn1DirectMode.setSelected(true);
+
+            mViewModel.setSelectedHall1CombineDisplayMode(DisplayMode.DIRECT);
+            mViewModel.setPreset(LEDPreset.PRESET_3, Hall.HALL_1);
+        });
+
+        btn2ASingleMode.setOnClickListener(v -> {
+           btn2ASingleMode.setSelected(true);
+           btn2ADoubleMode.setSelected(false);
+           btn2ADirectMode.setSelected(false);
+
+           mViewModel.setSelectedHall2ACombineDisplayMode(DisplayMode.SINGLE);
+           mViewModel.setPreset(LEDPreset.PRESET_1, Hall.HALL_2A);
+        });
+        btn2ADoubleMode.setOnClickListener(v -> {
+            btn2ASingleMode.setSelected(false);
+            btn2ADoubleMode.setSelected(true);
+            btn2ADirectMode.setSelected(false);
+
+            mViewModel.setSelectedHall2ACombineDisplayMode(DisplayMode.DOUBLE);
+            mViewModel.setPreset(LEDPreset.PRESET_2, Hall.HALL_2A);
+        });
+        btn2ADirectMode.setOnClickListener(v -> {
+            btn2ASingleMode.setSelected(false);
+            btn2ADoubleMode.setSelected(false);
+            btn2ADirectMode.setSelected(true);
+
+            mViewModel.setSelectedDisplayMode(DisplayMode.DIRECT);
+            mViewModel.setPreset(LEDPreset.PRESET_3, Hall.HALL_2A);
+        });
+        btn2BSingleMode.setOnClickListener(v -> {
+            btn2BSingleMode.setSelected(true);
+            btn2BDoubleMode.setSelected(false);
+            btn2BDirectMode.setSelected(false);
+
+            mViewModel.setSelectedHall2BCombineDisplayMode(DisplayMode.SINGLE);
+            mViewModel.setPreset(LEDPreset.PRESET_1, Hall.HALL_2B);
+        });
+        btn2BDoubleMode.setOnClickListener(v -> {
+            btn2BSingleMode.setSelected(false);
+            btn2BDoubleMode.setSelected(true);
+            btn2BDirectMode.setSelected(false);
+
+            mViewModel.setSelectedHall2BCombineDisplayMode(DisplayMode.DOUBLE);
+            mViewModel.setPreset(LEDPreset.PRESET_2, Hall.HALL_2B);
+        });
+        btn2BDirectMode.setOnClickListener(v -> {
+            btn2BSingleMode.setSelected(false);
+            btn2BDoubleMode.setSelected(false);
+            btn2BDirectMode.setSelected(true);
+
+            mViewModel.setSelectedDisplayMode(DisplayMode.DIRECT);
+            mViewModel.setPreset(LEDPreset.PRESET_3, Hall.HALL_2B);
+        });
+
+    }
+
+    private void setupOutputCombine(View view) {
+
+        ledPanelOutputList = new ArrayList<>();
+
+        rcvOutput = view.findViewById(R.id.rcv_output);
+        GridLayoutManager layoutManager = new GridLayoutManager(requireContext(),8, GridLayoutManager.VERTICAL,false);
+        rcvOutput.setLayoutManager(layoutManager);
+
+        ledOutputAdapter = new LEDPanelOutAdapter(ledPanelOutputList,item -> {
+//            mViewModel.setSelectedDeviceOutput(item);
+        });
+        rcvOutput.setAdapter(ledOutputAdapter);
+
+        btnUSB1 = view.findViewById(R.id.btn_combine_usb1);
+        btnUSB2 = view.findViewById(R.id.btn_combine_usb2);
+        btnWireless = view.findViewById(R.id.btn_combine_wireless);
+
+        btnCombine2USB1 = view.findViewById(R.id.btn_combine2_usb1);
+        btnCombine2USB2 = view.findViewById(R.id.btn_combine2_usb2);
+        btnCombine2Wireless = view.findViewById(R.id.btn_combine2_wireless);
+
+        View btn1 = view.findViewById(R.id.btn_1);
+        View btn2 = view.findViewById(R.id.btn_2);
+        View btn3 = view.findViewById(R.id.btn_3);
+
+        DisplaySourceItem usb1 = new DisplaySourceItem("USB-C 1", 1, R.drawable.ic_usb_c, false );
+        DisplaySourceItem usb2 = new DisplaySourceItem("USB-C 2", 2, R.drawable.ic_usb_c, false );
+        DisplaySourceItem wireless = new DisplaySourceItem("Wireless Share", 3, R.drawable.ic_wireless_share, false );
+        DisplaySourceItem combineUsb1 = new DisplaySourceItem("USB-C 1", 4, R.drawable.ic_usb_c, false );
+        DisplaySourceItem combineUsb2 = new DisplaySourceItem("USB-C 2", 5, R.drawable.ic_usb_c, false );
+        DisplaySourceItem combineWireless = new DisplaySourceItem("Wireless Share", 6, R.drawable.ic_wireless_share, false );
+
+        btnUSB1.setOnClickListener(view1 -> {
+            setCombineHallButtonState();
+            btnUSB1.setSelected(true);
+            mViewModel.setSelectedSource(usb1);
+        });
+
+        btnUSB2.setOnClickListener(view1 -> {
+            setCombineHallButtonState();
+            btnUSB2.setSelected(true);
+            mViewModel.setSelectedSource(usb2);
+        });
+
+        btnWireless.setOnClickListener(view1 -> {
+            setCombineHallButtonState();
+            btnWireless.setSelected(true);
+            mViewModel.setSelectedSource(wireless);
+        });
+
+        btnCombine2USB1.setOnClickListener(view1 -> {
+            setCombineHallButtonState();
+            btnCombine2USB1.setSelected(true);
+            mViewModel.setSelectedSource(combineUsb1);
+        });
+        btnCombine2USB2.setOnClickListener(view1 -> {
+            setCombineHallButtonState();
+            btnCombine2USB2.setSelected(true);
+            mViewModel.setSelectedSource(combineUsb2);
+        });
+        btnCombine2Wireless.setOnClickListener(view1 -> {
+            setCombineHallButtonState();
+            btnCombine2Wireless.setSelected(true);
+            mViewModel.setSelectedSource(combineWireless);
+        });
+
+        btn1.setOnClickListener(view1 -> {
+            mViewModel.routeSourceToSingle();
+            mViewModel.routeDSP();
+        });
+        btn2.setOnClickListener(view1 -> {
+            mViewModel.routeSourceTo2A();
+            mViewModel.routeDSP();
+        });
+        btn3.setOnClickListener(view1 -> {
+            mViewModel.routeSourceTo2B();
+            mViewModel.routeDSP();
+        });
+
+    }
+
+    private void setCombineHallButtonState() {
+        btnUSB1.setSelected(false);
+        btnUSB2.setSelected(false);
+        btnWireless.setSelected(false);
+
+        btnCombine2USB1.setSelected(false);
+        btnCombine2USB2.setSelected(false);
+        btnCombine2Wireless.setSelected(false);
     }
 
     private void fetchControlDevicesData() {
@@ -298,6 +560,42 @@ public class HallPanel extends Fragment {
                 displayOutputItem.setDeviceStatusVisible(true);
                 displayOutputItems.add(displayOutputItem);
             }
+
+            RoomDevice roomDevice1 = new RoomDevice();
+            roomDevice1.setId(71);
+            roomDevice1.setDeviceName("LED_WALL");
+            roomDevice1.setDeviceIpAddress("192.168.1.162");
+            roomDevice1.setDevicePort(15200);
+            roomDevice1.setDeviceDesc("Front TV");
+            roomDevice1.setOutPort(3);
+
+            DisplayOutputItem displayOutputItem1 = new DisplayOutputItem(roomDevice1, R.drawable.ic_output);
+            displayOutputItem1.setDeviceStatusVisible(true);
+            displayOutputItems.add(displayOutputItem1);
+
+            RoomDevice roomDevice2 = new RoomDevice();
+            roomDevice2.setId(72);
+            roomDevice2.setDeviceName("LED_WALL");
+            roomDevice2.setDeviceIpAddress("192.168.1.163");
+            roomDevice2.setDevicePort(15200);
+            roomDevice2.setDeviceDesc("Side TV");
+            roomDevice2.setOutPort(5);
+
+            DisplayOutputItem displayOutputItem2 = new DisplayOutputItem(roomDevice2, R.drawable.ic_output);
+            displayOutputItem2.setDeviceStatusVisible(true);
+            displayOutputItems.add(displayOutputItem2);
+
+            RoomDevice roomDevice3 = new RoomDevice();
+            roomDevice3.setId(73);
+            roomDevice3.setDeviceName("DSP");
+            roomDevice3.setDeviceIpAddress("192.168.1.164");
+            roomDevice3.setDevicePort(17300);
+            roomDevice3.setDeviceDesc("DSP");
+            roomDevice3.setOutPort(1);
+
+            DisplayOutputItem displayOutputItem3 = new DisplayOutputItem(roomDevice3, R.drawable.ic_output);
+            displayOutputItem3.setDeviceStatusVisible(true);
+            displayOutputItems.add(displayOutputItem3);
 
             mViewModel.connectAllDevices(displayOutputItems);
 
@@ -324,6 +622,15 @@ public class HallPanel extends Fragment {
             if (displayMode == DisplayMode.DIRECT) {
 
             }
+
+        });
+
+        mViewModel.getLedPanelOutputList().observe(getViewLifecycleOwner(), ledPanelOutputList -> {
+//            if (ledPanelOutputList == null) {
+//                return;
+//            }
+//
+//            ledOutputAdapter.setItems(ledPanelOutputList);
 
         });
     }
