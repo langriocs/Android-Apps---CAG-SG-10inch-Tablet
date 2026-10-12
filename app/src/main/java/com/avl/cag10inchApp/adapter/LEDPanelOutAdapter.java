@@ -1,10 +1,13 @@
 package com.avl.cag10inchApp.adapter;
 
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.avl.cag10inchApp.R;
 import com.avl.cag10inchApp.model.DisplayOutputItem;
 import com.avl.cag10inchApp.model.DisplaySourceItem;
 import com.avl.cag10inchApp.model.LEDPanelOutput;
@@ -17,17 +20,18 @@ public class LEDPanelOutAdapter extends RecyclerView.Adapter<LEDPanelHolder>{
     private List<LEDPanelOutput> ledPanelOutputList;
     private ILEDPanelOutputListener listener;
 
-    public LEDPanelOutAdapter(List<LEDPanelOutput> ledPanelOutputList,
+    public LEDPanelOutAdapter(
                               ILEDPanelOutputListener listener) {
 
-        this.ledPanelOutputList = ledPanelOutputList;
+        this.ledPanelOutputList = new ArrayList<>();
         this.listener = listener;
     }
 
     @NonNull
     @Override
     public LEDPanelHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return null;
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_led_panel, parent, false);
+        return new LEDPanelHolder(view);
     }
 
     @Override
@@ -36,6 +40,9 @@ public class LEDPanelOutAdapter extends RecyclerView.Adapter<LEDPanelHolder>{
         LEDPanelOutput item = ledPanelOutputList.get(position);
         holder.txtItem.setText(item.getDesc());
         holder.imgItem.setImageResource(item.getImg());
+        holder.getView().setOnClickListener(view -> {
+            listener.onLEDOutputItemClick(item);
+        });
     }
 
     @Override
@@ -44,11 +51,8 @@ public class LEDPanelOutAdapter extends RecyclerView.Adapter<LEDPanelHolder>{
     }
 
     public void setItems(List<LEDPanelOutput> items) {
-        if (items == null) {
-            ledPanelOutputList = new ArrayList<>();
-        } else {
-            ledPanelOutputList = new ArrayList<>(items);
-        }
+        ledPanelOutputList.clear();
+        ledPanelOutputList.addAll(items);
         notifyDataSetChanged();
     }
 }

@@ -18,6 +18,7 @@ import com.avl.cag10inchApp.repository.audio.DSPChannel;
 import com.avl.cag10inchApp.repository.audio.DSPRepository;
 import com.avl.cag10inchApp.repository.audio.IAudioListener;
 import com.avl.cag10inchApp.repository.audio.IDSPRepository;
+import com.avl.cag10inchApp.repository.audio.Preset;
 import com.avl.cag10inchApp.repository.ledwall.ILEDWallListener;
 import com.avl.cag10inchApp.repository.ledwall.ILEDWallRepository;
 import com.avl.cag10inchApp.repository.ledwall.LEDPreset;
@@ -75,6 +76,9 @@ public class HallPanelViewModel extends ViewModel {
     }
     public LiveData<Boolean> getIsLeftLedSelected() {
         return isLeftLedSelected;
+    }
+    public LiveData<List<DisplayOutputItem>> getDisplayOutputItems() {
+        return displayOutputItems;
     }
 
     private IRoomDevice connectLEDWall(String ip, int port) {
@@ -243,6 +247,19 @@ public class HallPanelViewModel extends ViewModel {
         ( (ISwitchRepository) item.getRoomDevice()).routeAV(selectedSourceDevice.getPortNumber(),1);
     }
 
+    public void routeSourceTo(int outputPort) {
+        if (selectedSourceDevice == null) {
+            return;
+        }
+
+        DisplayOutputItem item = getSelectedDeviceByIP("192.168.1.151");
+        if (item == null) {
+            return;
+        }
+
+        ( (ISwitchRepository) item.getRoomDevice()).routeAV(selectedSourceDevice.getPortNumber(),outputPort);
+    }
+
     public void routeSourceToLeft() {
         DisplayOutputItem item = getSelectedDeviceByIP("192.168.1.151");
         if (item == null) {
@@ -321,15 +338,17 @@ public class HallPanelViewModel extends ViewModel {
             ledOutputList = new ArrayList<>();
         }
 
+        ledOutputList.clear();
+
         if (hall1CombineDisplayMode != null) {
             if (hall1CombineDisplayMode == DisplayMode.SINGLE) {
-                LEDPanelOutput ledPanelOutput = new LEDPanelOutput("Hall1", R.drawable.ic_output);
+                LEDPanelOutput ledPanelOutput = new LEDPanelOutput("1", R.drawable.ic_output,1);
                 ledOutputList.add(ledPanelOutput);
 
             }
             if (hall1CombineDisplayMode == DisplayMode.DOUBLE) {
-                LEDPanelOutput ledPanelOutput1 = new LEDPanelOutput("Hall1 Left", R.drawable.ic_output);
-                LEDPanelOutput ledPanelOutput2 = new LEDPanelOutput("Hall1 Right", R.drawable.ic_output);
+                LEDPanelOutput ledPanelOutput1 = new LEDPanelOutput("1 - 1", R.drawable.ic_output,1);
+                LEDPanelOutput ledPanelOutput2 = new LEDPanelOutput("1 - 2", R.drawable.ic_output, 2);
                 ledOutputList.add(ledPanelOutput1);
                 ledOutputList.add(ledPanelOutput2);
             }
@@ -337,13 +356,13 @@ public class HallPanelViewModel extends ViewModel {
 
         if (hall2ACombineDisplayMode != null) {
             if (hall2ACombineDisplayMode == DisplayMode.SINGLE) {
-                LEDPanelOutput led2APanelOutput = new LEDPanelOutput("2A Single", R.drawable.ic_output);
+                LEDPanelOutput led2APanelOutput = new LEDPanelOutput("2A", R.drawable.ic_output, 3);
                 ledOutputList.add(led2APanelOutput);
             }
 
             if (hall2ACombineDisplayMode == DisplayMode.DOUBLE) {
-                LEDPanelOutput led2APanelOutput1 = new LEDPanelOutput("2A Left", R.drawable.ic_output);
-                LEDPanelOutput led2APanelOutput2 = new LEDPanelOutput("2A Right", R.drawable.ic_output);
+                LEDPanelOutput led2APanelOutput1 = new LEDPanelOutput("2A - 1", R.drawable.ic_output, 3);
+                LEDPanelOutput led2APanelOutput2 = new LEDPanelOutput("2A - 2", R.drawable.ic_output, 4);
                 ledOutputList.add(led2APanelOutput1);
                 ledOutputList.add(led2APanelOutput2);
             }
@@ -351,12 +370,12 @@ public class HallPanelViewModel extends ViewModel {
 
         if (hall2BCombineDisplayMode != null) {
             if (hall2BCombineDisplayMode == DisplayMode.SINGLE) {
-                LEDPanelOutput led2BPanelOutput = new LEDPanelOutput("2B Single", R.drawable.ic_output);
+                LEDPanelOutput led2BPanelOutput = new LEDPanelOutput("2B", R.drawable.ic_output,5);
                 ledOutputList.add(led2BPanelOutput);
             }
             if (hall2BCombineDisplayMode == DisplayMode.DOUBLE) {
-                LEDPanelOutput led2BPanelOutput1 = new LEDPanelOutput("2B Left", R.drawable.ic_output);
-                LEDPanelOutput led2BPanelOutput2 = new LEDPanelOutput("2B Right", R.drawable.ic_output);
+                LEDPanelOutput led2BPanelOutput1 = new LEDPanelOutput("2B - 1", R.drawable.ic_output,5);
+                LEDPanelOutput led2BPanelOutput2 = new LEDPanelOutput("2B - 2", R.drawable.ic_output,6);
                 ledOutputList.add(led2BPanelOutput1);
                 ledOutputList.add(led2BPanelOutput2);
             }
@@ -393,8 +412,14 @@ public class HallPanelViewModel extends ViewModel {
         ( (ISwitchRepository) item.getRoomDevice()).routeAV(selectedSourceDevice.getPortNumber(),5);
     }
 
-    public void presetRecall() {
-        DisplayOutputItem item = getSelectedDeviceByIP("192.168.1.151");
+    public void presetRecall(Preset preset) {
+        DisplayOutputItem item = getSelectedDeviceByIP("192.168.1.153");
+
+        if (item == null) {
+            return;
+        }
+
+        ( (IDSPRepository) item.getRoomDevice()).setRecallPreset(preset);
 
     }
 }

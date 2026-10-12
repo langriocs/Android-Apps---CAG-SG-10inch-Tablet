@@ -4,10 +4,12 @@ public class LEDPanelOutput {
 
     private String desc;
     private int img;
+    private int outport;
 
-    public LEDPanelOutput(String desc,int img) {
+    public LEDPanelOutput(String desc,int img, int outport) {
         this.desc = desc;
         this.img = img;
+        this.outport = outport;
     }
 
     public String getDesc() {
@@ -24,5 +26,13 @@ public class LEDPanelOutput {
 
     public void setImg(int img) {
         this.img = img;
+    }
+
+    public int getOutport() {
+        return outport;
+    }
+
+    public void setOutport(int outport) {
+        this.outport = outport;
     }
 }

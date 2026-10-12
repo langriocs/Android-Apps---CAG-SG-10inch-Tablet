@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.avl.cag10inchApp.R;
-import com.avl.cag10inchApp.adapter.DisplayOutputAdapter;
 import com.avl.cag10inchApp.adapter.LEDPanelOutAdapter;
 import com.avl.cag10inchApp.model.DisplayMode;
 import com.avl.cag10inchApp.model.DisplayOutputItem;
@@ -26,6 +25,7 @@ import com.avl.cag10inchApp.model.Hall;
 import com.avl.cag10inchApp.model.HallOperation;
 import com.avl.cag10inchApp.model.LEDPanelOutput;
 import com.avl.cag10inchApp.model.vo.RoomDevice;
+import com.avl.cag10inchApp.repository.audio.Preset;
 import com.avl.cag10inchApp.repository.ledwall.LEDPreset;
 import com.avl.cag10inchApp.viewmodel.HallPanelView;
 import com.avl.cag10inchApp.viewmodel.HallPanelViewModel;
@@ -35,6 +35,7 @@ import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class HallPanel extends Fragment {
 
@@ -95,7 +96,7 @@ public class HallPanel extends Fragment {
         setupLayoutDisplay(view);
         setupDisplayMode(view);
         setupSource(view);
-        setupCombineHall(view);
+        setupCombineHallDisplayMode(view);
         setupOutputCombine(view);
         fetchControlDevicesData();
         observerViewModel();
@@ -107,10 +108,13 @@ public class HallPanel extends Fragment {
 
         btnSeparateHall.setOnClickListener(v -> {
             switchLayoutDisplay(HallPanelView.HALL_DISPLAY_MODE_SELECT);
-            mViewModel.presetRecall();
+            mViewModel.presetRecall(Preset.RECALL_1);
         });
 
-        btnCombineHall.setOnClickListener(v -> switchLayoutDisplay(HallPanelView.HALL_COMBINE_MODE));
+        btnCombineHall.setOnClickListener(v -> {
+            switchLayoutDisplay(HallPanelView.HALL_COMBINE_MODE);
+            mViewModel.presetRecall(Preset.RECALL_2);
+        });
     }
 
     private void setupDisplayMode(View view) {
@@ -347,7 +351,7 @@ public class HallPanel extends Fragment {
         }
     }
 
-    private void setupCombineHall(View view){
+    private void setupCombineHallDisplayMode(View view){
         View btn1SingleMode = view.findViewById(R.id.btn_1_single_mode);
         View btn1DoubleMode = view.findViewById(R.id.btn_1_double_mode);
         View btn1DirectMode = view.findViewById(R.id.btn_1_direct_mode);
@@ -449,15 +453,18 @@ public class HallPanel extends Fragment {
 
     private void setupOutputCombine(View view) {
 
-        ledPanelOutputList = new ArrayList<>();
-
         rcvOutput = view.findViewById(R.id.rcv_output);
         GridLayoutManager layoutManager = new GridLayoutManager(requireContext(),8, GridLayoutManager.VERTICAL,false);
         rcvOutput.setLayoutManager(layoutManager);
 
-        ledOutputAdapter = new LEDPanelOutAdapter(ledPanelOutputList,item -> {
-//            mViewModel.setSelectedDeviceOutput(item);
+        ledOutputAdapter = new LEDPanelOutAdapter(item -> {
+            if (item != null) {
+                return;
+            }
+            mViewModel.routeSourceTo(item.getOutport());
+            mViewModel.routeDSP();
         });
+
         rcvOutput.setAdapter(ledOutputAdapter);
 
         btnUSB1 = view.findViewById(R.id.btn_combine_usb1);
@@ -468,9 +475,9 @@ public class HallPanel extends Fragment {
         btnCombine2USB2 = view.findViewById(R.id.btn_combine2_usb2);
         btnCombine2Wireless = view.findViewById(R.id.btn_combine2_wireless);
 
-        View btn1 = view.findViewById(R.id.btn_1);
-        View btn2 = view.findViewById(R.id.btn_2);
-        View btn3 = view.findViewById(R.id.btn_3);
+//        View btn1 = view.findViewById(R.id.btn_1);
+//        View btn2 = view.findViewById(R.id.btn_2);
+//        View btn3 = view.findViewById(R.id.btn_3);
 
         DisplaySourceItem usb1 = new DisplaySourceItem("USB-C 1", 1, R.drawable.ic_usb_c, false );
         DisplaySourceItem usb2 = new DisplaySourceItem("USB-C 2", 2, R.drawable.ic_usb_c, false );
@@ -513,18 +520,18 @@ public class HallPanel extends Fragment {
             mViewModel.setSelectedSource(combineWireless);
         });
 
-        btn1.setOnClickListener(view1 -> {
-            mViewModel.routeSourceToSingle();
-            mViewModel.routeDSP();
-        });
-        btn2.setOnClickListener(view1 -> {
-            mViewModel.routeSourceTo2A();
-            mViewModel.routeDSP();
-        });
-        btn3.setOnClickListener(view1 -> {
-            mViewModel.routeSourceTo2B();
-            mViewModel.routeDSP();
-        });
+//        btn1.setOnClickListener(view1 -> {
+//            mViewModel.routeSourceToSingle();
+//            mViewModel.routeDSP();
+//        });
+//        btn2.setOnClickListener(view1 -> {
+//            mViewModel.routeSourceTo2A();
+//            mViewModel.routeDSP();
+//        });
+//        btn3.setOnClickListener(view1 -> {
+//            mViewModel.routeSourceTo2B();
+//            mViewModel.routeDSP();
+//        });
 
     }
 
@@ -625,12 +632,36 @@ public class HallPanel extends Fragment {
 
         });
 
-        mViewModel.getLedPanelOutputList().observe(getViewLifecycleOwner(), ledPanelOutputList -> {
-//            if (ledPanelOutputList == null) {
+        mViewModel.getDisplayOutputItems().observe(getViewLifecycleOwner(), displayOutputItems -> {
+            // update the display output items;
+            if (displayOutputItems == null) {
+                return;
+            }
+
+//            List<DisplayOutputItem> displayOutputItemList = displayOutputItems.stream().filter(displayOutputItem -> {
+//                return displayOutputItem.getDisplayName().equals("LED_WALL");
+//            }).collect(Collectors.toList());
+//
+//            if (displayOutputItemList == null) {
 //                return;
 //            }
 //
+//            for (DisplayOutputItem item : displayOutputItemList) {
+//                if (item != null) {
+//                    LEDPanelOutput ledPanelOutput = new LEDPanelOutput(item.getDisplayName(), R.drawable.ic_output);
+//                    ledPanelOutputList.add(ledPanelOutput);
+//                }
+//            }
+//
 //            ledOutputAdapter.setItems(ledPanelOutputList);
+        });
+
+        mViewModel.getLedPanelOutputList().observe(getViewLifecycleOwner(), ledPanelOutputList -> {
+            if (ledPanelOutputList == null) {
+                return;
+            }
+
+            ledOutputAdapter.setItems(ledPanelOutputList);
 
         });
     }

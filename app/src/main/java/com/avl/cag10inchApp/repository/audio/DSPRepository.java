@@ -99,6 +99,16 @@ public class DSPRepository implements IDSPRepository, IRoomDevice {
     }
 
     @Override
+    public void setRecallPreset(Preset preset) {
+        if (preset == Preset.RECALL_1) {
+            tcpClient.sendMessage("CALLP S 0000 00 NC 1 \r");
+        }
+        if (preset == Preset.RECALL_2) {
+            tcpClient.sendMessage("CALLP S 0000 00 NC 2 \r");
+        }
+    }
+
+    @Override
     public void cleanup() {
 
     }

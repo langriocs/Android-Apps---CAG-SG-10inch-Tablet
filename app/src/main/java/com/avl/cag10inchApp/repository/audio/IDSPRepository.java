@@ -7,5 +7,6 @@ public interface IDSPRepository {
     void setVolume( int faderValue);
     void setMute( int value);
     void setListener(IAudioListener listener);
+    void setRecallPreset(Preset preset);
     void cleanup();
 }
